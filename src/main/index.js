@@ -1,10 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -13,7 +12,8 @@ function createWindow() {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: true
     }
   })
 
@@ -26,8 +26,17 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; connect-src 'self' https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1/ https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1/licenses/validate; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+        ]
+      }
+    });
+  });
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -35,40 +44,93 @@ function createWindow() {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+app.commandLine.appendSwitch('ignore-certificate-errors');
+
 app.whenReady().then(() => {
-  // Set app user model id for windows
+  app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+    if (url.startsWith('https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/')) {
+      event.preventDefault();
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
+
+  ipcMain.handle('api-request', async (event, options) => {
+    const { method = 'GET', endpoint, data } = options;
+    const baseUrl = 'https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1';
+    
+    return new Promise((resolve, reject) => {
+      const request = net.request({
+        method: method,
+        url: `${baseUrl}/${endpoint}`,
+        rejectUnauthorized: false 
+      });
+      
+      // Configurar headers
+      request.setHeader('Content-Type', 'application/json');
+      
+      let responseData = '';
+      
+      request.on('response', (response) => {
+        response.on('data', (chunk) => {
+          responseData += chunk.toString();
+        });
+        
+        response.on('end', () => {
+          console.log(`API Response (${response.statusCode}):`, responseData);
+          
+          try {
+            const data = responseData ? JSON.parse(responseData) : {};
+            resolve({
+              status: response.statusCode,
+              headers: response.headers,
+              data: data
+            });
+          } catch (error) {
+            console.error('Error parsing response:', error);
+            resolve({
+              status: response.statusCode,
+              headers: response.headers,
+              data: responseData,
+              parseError: error.message
+            });
+          }
+        });
+      });
+      
+      request.on('error', (error) => {
+        console.error('Network error:', error);
+        reject(error);
+      });
+      
+      if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        const jsonData = JSON.stringify(data);
+        console.log(`Sending data to API: ${jsonData}`);
+        request.write(jsonData);
+      }
+      
+      request.end();
+    });
+  });
+
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+});

@@ -23,8 +23,7 @@ export default [
       'react-refresh': eslintPluginReactRefresh
     },
     rules: {
-      ...eslintPluginReactHooks.configs.recommended.rules,
-      ...eslintPluginReactRefresh.configs.vite.rules
+      'no-alert': 'off'
     }
   },
   eslintConfigPrettier
