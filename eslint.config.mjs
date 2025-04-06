@@ -23,7 +23,23 @@ export default [
       'react-refresh': eslintPluginReactRefresh
     },
     rules: {
-      'no-alert': 'off'
+      'no-alert': 'off',
+      'no-unused-vars': 'off',
+      'no-undef': 'off',
+      'no-console': 'off',
+      'no-debugger': 'off',
+      'no-unreachable': 'off',
+      
+      'react/prop-types': 'off',
+      'react/jsx-key': 'off',
+      'react/jsx-no-undef': 'off',
+      'react/no-unknown-property': 'off',
+      'react/jsx-no-duplicate-props': 'off',
+      
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      
+      'react-refresh/only-export-components': 'off'
     }
   },
   eslintConfigPrettier

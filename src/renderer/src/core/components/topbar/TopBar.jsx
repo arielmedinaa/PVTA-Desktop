@@ -33,7 +33,6 @@ const TopBar = ({ title, user, isMobile, openSidebar }) => {
       </div>
 
       <div className="flex items-center space-x-3">
-        {/* Search Bar */}
         <div className="relative hidden md:block">
           <input
             type="text"
@@ -44,26 +43,18 @@ const TopBar = ({ title, user, isMobile, openSidebar }) => {
             <RiSearchLine className="h-5 w-5 text-gray-400" />
           </div>
         </div>
-
-        {/* Create Button */}
         <button className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-full flex items-center space-x-1 transition-colors">
           <RiAddLine className="h-5 w-5" />
           <span className="hidden md:inline">Create</span>
         </button>
-
-        {/* Notification */}
         <button className="p-2 rounded-full hover:bg-gray-200 transition-colors relative">
           <RiNotification3Line className="h-6 w-6 text-gray-600" />
           <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
         </button>
-
-        {/* Messages */}
         <button className="p-2 rounded-full hover:bg-gray-200 transition-colors relative">
           <RiChat3Line className="h-6 w-6 text-gray-600" />
           <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
         </button>
-
-        {/* User Profile */}
         {user && (
           <div className="relative">
             <button className="h-10 w-10 rounded-full overflow-hidden border-2 border-white">

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../core/context/AuthContext';
-import { 
-  RiArrowRightSLine, 
-  RiUserLine, 
+import {
+  RiArrowRightSLine,
+  RiUserLine,
   RiMoneyDollarCircleLine,
 } from 'react-icons/ri';
 
@@ -10,20 +10,18 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [timeRange, setTimeRange] = useState('Last month');
   const [productTimeRange, setProductTimeRange] = useState('Last 7 days');
-  
-  // Datos de ejemplo
-  const statsData = {
-    customers: {
-      total: 1293,
-      growth: 36.8,
-      previousPeriod: 'last month'
-    },
-    balance: {
-      total: '256k',
-      growth: 36.8,
-      previousPeriod: 'last month'
-    }
-  };
+  // const statsData = {
+  //   customers: {
+  //     total: 1293,
+  //     growth: 36.8,
+  //     previousPeriod: 'last month'
+  //   },
+  //   balance: {
+  //     total: '256k',
+  //     growth: 36.8,
+  //     previousPeriod: 'last month'
+  //   }
+  // };
 
   const newCustomers = {
     count: 857,
@@ -95,79 +93,83 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold mb-6">Overview</h2>
+      <div className="bg-white rounded-3xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold">Overview</h2>
+          <div className="flex items-center">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Last month</option>
+              <option>Last week</option>
+              <option>Last year</option>
+            </select>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Customers Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2 rounded-3xl bg-gray-50 border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center mb-4">
               <RiUserLine className="w-6 h-6 text-gray-500 mr-2" />
               <h3 className="text-lg font-medium">Customers</h3>
             </div>
-            
+
             <div className="flex items-baseline mb-1">
-              <span className="text-5xl font-bold">{statsData.customers.total}</span>
-              <span className="ml-4 px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm">
-                ↑ {statsData.customers.growth}%
+              <span className="text-5xl font-bold">1,293</span>
+              <span className="ml-4 px-2 py-1 rounded-md bg-red-100 text-red-800 text-sm">
+                ↓ 36.8%
               </span>
             </div>
-            <p className="text-gray-500 text-sm">vs {statsData.customers.previousPeriod}</p>
+            <p className="text-gray-500 text-sm">vs last month</p>
           </div>
-
-          {/* Balance Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="border border-gray-100 shadow-sm rounded-2xl p-6">
             <div className="flex items-center mb-4">
               <RiMoneyDollarCircleLine className="w-6 h-6 text-gray-500 mr-2" />
               <h3 className="text-lg font-medium">Balance</h3>
             </div>
-            
+
             <div className="flex items-baseline mb-1">
-              <span className="text-5xl font-bold">{statsData.balance.total}</span>
+              <span className="text-5xl font-bold">256k</span>
               <span className="ml-4 px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm">
-                ↑ {statsData.balance.growth}%
+                ↑ 36.8%
               </span>
             </div>
-            <p className="text-gray-500 text-sm">vs {statsData.balance.previousPeriod}</p>
+            <p className="text-gray-500 text-sm">vs last month</p>
           </div>
         </div>
-      </div>
 
-      {/* New Customers Section */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-          <h3 className="text-lg font-medium">{newCustomers.count} new customers today!</h3>
-          <p className="text-gray-500 text-sm mt-1 sm:mt-0">Send a welcome message to all new customers.</p>
-        </div>
-
-        <div className="flex space-x-6 overflow-x-auto pb-4">
-          {newCustomers.avatars.map(customer => (
-            <div key={customer.id} className="flex flex-col items-center flex-shrink-0">
-              <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
-                <img 
-                  src={customer.image} 
-                  alt={customer.name} 
-                  className="w-full h-full object-cover"
-                />
+        <div className="mt-8">
+          <h3 className="text-lg font-medium mb-2">857 new customers today!</h3>
+          <p className="text-gray-500 text-sm mb-6">Send a welcome message to all new customers.</p>
+          <div className="flex space-x-6 overflow-x-auto pb-4">
+            {newCustomers.avatars.map(customer => (
+              <div key={customer.id} className="flex flex-col items-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
+                  <img
+                    src={customer.image}
+                    alt={customer.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-sm">{customer.name}</p>
               </div>
-              <p className="text-sm">{customer.name}</p>
+            ))}
+            <div className="flex items-center justify-center flex-shrink-0">
+              <button className="w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                <RiArrowRightSLine className="w-6 h-6 text-gray-400" />
+              </button>
+              <span className="ml-2 text-sm text-gray-500">View all</span>
             </div>
-          ))}
-          <div className="flex items-center justify-center flex-shrink-0">
-            <button className="w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center">
-              <RiArrowRightSLine className="w-6 h-6 text-gray-400" />
-            </button>
-            <span className="ml-2 text-sm text-gray-500">View all</span>
           </div>
         </div>
       </div>
-
-      {/* Products Section */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Popular products</h2>
           <div className="flex items-center">
-            <select 
+            <select
               value={productTimeRange}
               onChange={(e) => setProductTimeRange(e.target.value)}
               className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -185,17 +187,16 @@ const Dashboard = () => {
               <div key={product.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
+                    <img
+                      src={product.image}
+                      alt={product.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div>
                     <h4 className="font-medium">{product.name}</h4>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      product.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`text-xs px-2 py-1 rounded-full ${product.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
                       {product.status}
                     </span>
                   </div>
@@ -213,7 +214,7 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="mt-6">
             <button className="w-full py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
               All products
@@ -225,15 +226,15 @@ const Dashboard = () => {
       {/* Comments Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-bold">Comments</h2>
-        
+
         <div className="bg-white rounded-xl shadow-sm p-6">
           {comments.map(comment => (
             <div key={comment.id} className="py-4 border-b border-gray-100 last:border-0">
               <div className="flex items-center mb-2">
                 <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                  <img 
-                    src={comment.avatar} 
-                    alt={comment.user} 
+                  <img
+                    src={comment.avatar}
+                    alt={comment.user}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -257,7 +258,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Product view</h2>
           <div className="flex items-center">
-            <select 
+            <select
               value={productTimeRange}
               onChange={(e) => setProductTimeRange(e.target.value)}
               className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -268,7 +269,7 @@ const Dashboard = () => {
             </select>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-xl shadow-sm p-6 h-72 relative">
           {/* Chart Placeholder */}
           <div className="absolute inset-0 flex items-end justify-around p-6">
@@ -286,7 +287,7 @@ const Dashboard = () => {
             <div className="h-24 w-6 bg-gray-200 rounded-t-md"></div>
             <div className="h-16 w-6 bg-gray-200 rounded-t-md"></div>
           </div>
-          
+
           <div className="absolute bottom-6 left-6 text-3xl font-bold text-gray-300">
             $10.2m
           </div>

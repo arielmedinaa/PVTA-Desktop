@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-//import { useNavigate } from 'react-router-dom';
 import Sidebar from '../core/components/sidebar/SideBar';
+import TopBar from '../core/components/topbar/TopBar';
 import { useAuth } from '../core/context/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user } = useAuth();
-  //const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,17 +28,25 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path.includes('/dashboard')) return 'Dashboard';
+    if (path.includes('/products')) return 'Products';
+    if (path.includes('/customers')) return 'Customers';
+    if (path.includes('/shop')) return 'Shop';
+    if (path.includes('/income')) return 'Income';
+    if (path.includes('/promote')) return 'Promote';
+    return 'Dashboard';
+  };
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div 
           className="fixed inset-0 z-20 bg-black bg-opacity-50 transition-opacity lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
-      {/* Sidebar */}
       <div 
         className={`${
           isMobile 
@@ -44,51 +54,34 @@ const Layout = ({ children }) => {
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full'
               }` 
             : 'relative'
-        } transition-all duration-300 ease-in-out`}
+        } transition-all duration-300 ease-in-out bg-transparent`}
       >
         <Sidebar 
           collapsed={collapsed} 
-          setCollapsed={setCollapsed} 
+          setCollapsed={setCollapsed}
+          activeRoute={location.pathname}
         />
       </div>
-
-      {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        {/* Mobile header */}
-        {isMobile && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-500 focus:outline-none"
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopBar 
+          title={getPageTitle()} 
+          user={user} 
+          isMobile={isMobile}
+          openSidebar={() => setSidebarOpen(true)}
+        />
+        <main className="flex-1 overflow-auto p-6 bg-gray-50">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
             >
-              <svg 
-                className="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-            
-            <div className="flex items-center">
-              {user && (
-                <div className="text-sm text-right">
-                  <p className="font-medium text-gray-800">{user.nombre}</p>
-                  <p className="text-xs text-gray-500">{user.tipo}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        <main className="p-6">
-          {children}
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>
