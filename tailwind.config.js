@@ -11,7 +11,7 @@ module.exports = {
           200: '#B8D9FF',
           300: '#8ABEFF',
           400: '#5CA3FF',
-          500: '#2563EB', // Color principal como en la imagen
+          500: '#2563EB',
           600: '#1D4ED8',
           700: '#1E40AF',
           800: '#1E3A8A',

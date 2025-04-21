@@ -1,14 +1,13 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createHashRouter, Navigate, Outlet } from 'react-router-dom';
 import Layout from '../layouts/AppLayout';
 import Login from '../pages/Login';
-import Dashboard from '../pages/Dashboard';
+import Dashboard from '../pages/modules/home/Dashboard';
+import ListaProductos from '../pages/modules/products/ListaProductos';
 import { useAuth } from '../core/context/AuthContext';
+import SalesPage from '../pages/modules/sales/invoice/FVsales';
 
-// Componente para rutas protegidas con contexto
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
-  
-  // Mientras verifica la autenticación
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -17,16 +16,12 @@ const ProtectedRoute = () => {
     );
   }
   
-  // Si no está autenticado, redirige al login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
-  // Si está autenticado, muestra el contenido
   return <Outlet />;
 };
 
-// Configuración del Layout con rutas anidadas
 const AppLayout = () => {
   return (
     <Layout>
@@ -35,7 +30,6 @@ const AppLayout = () => {
   );
 };
 
-// Componente para redireccionar usuarios ya autenticados
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
@@ -47,7 +41,6 @@ const PublicRoute = ({ children }) => {
     );
   }
   
-  // Si ya está autenticado, redirige al dashboard
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -55,7 +48,6 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Crear las rutas
 const routes = [
   {
     path: '/login',
@@ -82,7 +74,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: <div className="p-4">Lista de Productos</div>
+                element: <ListaProductos />
               },
               {
                 path: 'overview',
@@ -131,8 +123,19 @@ const routes = [
           {
             path: 'promote',
             element: <div className="p-4">Promociones</div>
-          }
+          },
+          
         ]
+      }
+    ]
+  },
+  {
+    path: 'sales',
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '',
+        element: <SalesPage />
       }
     ]
   },
@@ -142,6 +145,6 @@ const routes = [
   }
 ];
 
-const router = createBrowserRouter(routes);
+const router = createHashRouter(routes);
 
 export default router;

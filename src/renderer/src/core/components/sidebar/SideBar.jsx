@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+//import { motion, AnimatePresence } from 'framer-motion';
 import { 
   RiDashboardLine, 
   RiProductHuntLine, 
@@ -11,7 +11,8 @@ import {
   RiMegaphoneLine,
   RiArrowDownSLine,
   RiArrowUpSLine,
-  RiLogoutBoxLine
+  RiLogoutBoxLine,
+  RiShoppingCartLine
 } from 'react-icons/ri';
 
 const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
@@ -23,21 +24,21 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
   const menuItems = [
     {
       id: 'dashboard',
-      title: 'Dashboard',
+      title: 'Home',
       icon: <RiDashboardLine className="w-6 h-6" />,
       path: '/dashboard',
       hasSubmenu: false
     },
     {
       id: 'products',
-      title: 'Products',
+      title: 'Productos',
       icon: <RiProductHuntLine className="w-6 h-6" />,
       path: '/products',
       hasSubmenu: false
     },
     {
       id: 'customers',
-      title: 'Customers',
+      title: 'Clientes',
       icon: <RiUserLine className="w-6 h-6" />,
       path: '/customers',
       hasSubmenu: false
@@ -51,16 +52,23 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
     },
     {
       id: 'income',
-      title: 'Income',
+      title: 'Operaciones',
       icon: <RiLineChartLine className="w-6 h-6" />,
       path: '/income',
       hasSubmenu: false
     },
     {
       id: 'promote',
-      title: 'Promote',
+      title: 'Promociones',
       icon: <RiMegaphoneLine className="w-6 h-6" />,
       path: '/promote',
+      hasSubmenu: false
+    },
+    {
+      id: 'sales',
+      title: 'Sales',
+      icon: <RiShoppingCartLine className="w-6 h-6" />,
+      path: '/sales',
       hasSubmenu: false
     }
   ];
@@ -86,7 +94,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
     <div 
       className={`h-screen transition-all duration-300 ${
         collapsed ? 'w-20' : 'w-64'
-      } flex flex-col bg-transparent backdrop-blur-sm`}
+      } flex flex-col bg-slate-50/60 backdrop-blur-sm`}
     >
       <div className="p-4 flex justify-center">
         <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
@@ -112,7 +120,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
                 }`}
               >
                 <div className="flex items-center flex-1">
-                  <span className={isActive(item.path) ? "text-gray-900" : "text-gray-500"}>
+                  <span className={isActive(item.path) ? "text-blue-500" : "text-gray-500"}>
                     {item.icon}
                   </span>
                   {!collapsed && (
@@ -137,10 +145,10 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
           <div className="flex justify-between items-center">
             <button 
               onClick={handleLogout}
-              className="flex items-center text-gray-500 hover:text-gray-700 transition-colors"
+              className="flex items-center text-red-500 hover:text-red-600 transition-colors"
             >
               <RiLogoutBoxLine className="w-5 h-5 mr-2" />
-              <span>Logout</span>
+              <span>Cerrar Sesion</span>
             </button>
             <button 
               onClick={() => setCollapsed(true)}
@@ -153,7 +161,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
           <div className="flex flex-col space-y-3 items-center">
             <button 
               onClick={handleLogout}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-red-500 hover:text-red-700 transition-colors"
               title="Logout"
             >
               <RiLogoutBoxLine className="w-5 h-5" />
