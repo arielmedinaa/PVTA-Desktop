@@ -3,8 +3,9 @@ import Layout from '../layouts/AppLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/modules/home/Dashboard';
 import ListaProductos from '../pages/modules/products/ListaProductos';
-import { useAuth } from '../core/context/AuthContext';
 import SalesPage from '../pages/modules/sales/invoice/FVsales';
+import Clientes from '../pages/modules/customers/Clientes';
+import { useAuth } from '../core/context/AuthContext';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -92,7 +93,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: <div className="p-4">Lista de Clientes</div>
+                element: <Clientes />
               },
               {
                 path: 'segments',

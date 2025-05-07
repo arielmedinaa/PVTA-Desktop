@@ -1,6 +1,7 @@
 import React from 'react';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import SearchBar from './components/SearchBar';
+import FilterOptionsSales from './components/FilterOptionsSales';
 import MenuCategories from './components/MenuCategories';
 import ProductGrid from './components/ProductGrid';
 import OrderSidebar from './components/OrderSidebar';
@@ -56,10 +57,14 @@ const SalesPage = () => {
               <h1 className="text-xl font-semibold">Choose Menu</h1>
             </div>
             
+            <div className='flex items-center gap-5'>
+            <FilterOptionsSales />
+
             <SearchBar 
               searchTerm={searchTerm} 
               setSearchTerm={setSearchTerm} 
             />
+            </div>
           </div>
           
           <MenuCategories 

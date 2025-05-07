@@ -3,14 +3,10 @@ import ModalCreateProd from "./components/modals/modalCreateProducts"
 import {
     RiSearchLine,
     RiFilterLine,
-    RiFileTextLine,
-    RiMore2Line,
-    RiArrowRightLine,
-    RiArrowLeftLine,
-    RiDownload2Line,
-    RiUpload2Line,
-    RiAddLine
 } from 'react-icons/ri';
+import TablaProductos from './components/table/TablaProductos';
+import Header from './components/header/HeaderListaProductos';
+import Paginacion1 from '../../../core/components/pagination/Paginacion1';
 
 const ListaProductos = () => {
     const [selectedFilter, setSelectedFilter] = useState('All');
@@ -23,7 +19,6 @@ const ListaProductos = () => {
         { label: 'Out of Stock', value: '$256.87', color: 'red', icon: '✕', lastUpdate: 'Last update: Jan 24' },
     ];
 
-    // Datos de ejemplo para productos
     const products = [
         {
             id: 'P10001',
@@ -90,7 +85,6 @@ const ListaProductos = () => {
         },
     ];
 
-    // Obtener el color de estado
     const getStatusColor = (status) => {
         switch (status) {
             case 'In Stock': return 'bg-green-100 text-green-800';
@@ -100,30 +94,13 @@ const ListaProductos = () => {
         }
     };
 
-    // Filtros de productos
     const filters = ['All', 'In Stock', 'Low Stock', 'Out of Stock'];
 
     return (
         <>
             <div className="space-y-8">
                 <div className="bg-white rounded-3xl shadow-sm p-6">
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-2xl font-bold">Lista de Productos</h1>
-                        <div className="flex space-x-3">
-                            <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50">
-                                <RiDownload2Line className="w-5 h-5" />
-                                <span>Export</span>
-                            </button>
-                            <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50">
-                                <RiUpload2Line className="w-5 h-5" />
-                                <span>Import</span>
-                            </button>
-                            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600" onClick={() => setIsModalOpen(true)}>
-                                <RiAddLine className="w-5 h-5" />
-                                <span>New Product</span>
-                            </button>
-                        </div>
-                    </div>
+                    <Header setIsModalOpen={setIsModalOpen} />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 rounded-3xl bg-gray-50 border border-gray-100 p-2">
                         {summaryData.map((item, index) => (
@@ -176,98 +153,16 @@ const ListaProductos = () => {
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 text-left">
-                                    <tr>
-                                        <th className="px-5 py-4">
-                                            <input type="checkbox" className="rounded text-blue-600 focus:ring-blue-500" />
-                                        </th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Product ID</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Product</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Category</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Status</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Stock</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium">Price</th>
-                                        <th className="px-5 py-4 text-gray-600 font-medium"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.map((product) => (
-                                        <tr key={product.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                                            <td className="px-5 py-4">
-                                                <input type="checkbox" className="rounded text-blue-600 focus:ring-blue-500" />
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center space-x-2">
-                                                    <RiFileTextLine className="text-gray-400" />
-                                                    <span>{product.id}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                                        <img
-                                                            src={product.image}
-                                                            alt={product.name}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <span className="font-medium">{product.name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-4 text-gray-600">{product.category}</td>
-                                            <td className="px-5 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
-                                                    {product.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-4 text-gray-600">{product.stock}</td>
-                                            <td className="px-5 py-4 font-medium">{product.price}</td>
-                                            <td className="px-5 py-4 text-right">
-                                                <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full">
-                                                    <RiMore2Line className="w-5 h-5" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            <TablaProductos products={products} getStatusColor={getStatusColor} />
                         </div>
 
-                        <div className="p-5 border-t border-gray-100 flex justify-between items-center">
-                            <div className="text-sm text-gray-600">
-                                Showing 1-{products.length} of 134 entries
-                            </div>
-                            <div className="flex space-x-2">
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                                    <RiArrowLeftLine className="w-4 h-4" />
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-transparent bg-blue-500 text-white font-medium">
-                                    1
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                                    2
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                                    3
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
-                                    ...
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                                    12
-                                </button>
-                                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                                    <RiArrowRightLine className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
+                        <Paginacion1 data={products} />
                     </div>
                 </div>
             </div>
-            <ModalCreateProd 
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)} 
+            <ModalCreateProd
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
             />
         </>
     );

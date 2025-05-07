@@ -31,7 +31,7 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self'; connect-src 'self' https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1/ https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1/licenses/validate; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+          "default-src 'self'; connect-src 'self' http://localhost:8000/api/v1/ http://localhost:8000/api/v1/licenses/validate; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
         ]
       }
     });
@@ -48,7 +48,7 @@ app.commandLine.appendSwitch('ignore-certificate-errors');
 
 app.whenReady().then(() => {
   app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-    if (url.startsWith('https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/')) {
+    if (url.startsWith('http://localhost:8000/')) {
       event.preventDefault();
       callback(true);
     } else {
@@ -58,7 +58,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('api-request', async (event, options) => {
     const { method = 'GET', endpoint, data } = options;
-    const baseUrl = 'https://afb97bbc452174507bb5481af75fe23d-1677393026.us-east-2.elb.amazonaws.com/api/v1';
+    const baseUrl = 'http://localhost:8000/api/v1';
     
     return new Promise((resolve, reject) => {
       const request = net.request({
