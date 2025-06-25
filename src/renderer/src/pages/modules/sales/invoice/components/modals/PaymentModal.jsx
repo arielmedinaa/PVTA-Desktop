@@ -10,16 +10,13 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
   const [amountEntered, setAmountEntered] = useState('');
   const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
 
-  // Resets the amount when modal opens
   useEffect(() => {
     if (isOpen) {
       setAmountEntered('');
     }
   }, [isOpen]);
 
-  // Quick amount buttons
   const quickAmounts = [5, 10, 20, 50];
-
   const handleQuickAmount = (amount) => {
     setAmountEntered(prev => {
       const newAmount = parseFloat(prev || 0) + amount;

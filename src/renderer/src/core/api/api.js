@@ -1,4 +1,5 @@
 const apiUrl = import.meta.env.VITE_API_URL;
+const businessUrl = import.meta.env.VITE_BUSINESS_URL;
 
 export const validateLogin = async (body) => {
     console.log('pasa por el post')
@@ -16,6 +17,70 @@ export const validateLogin = async (body) => {
         } else {
             const data = await res.json();
             console.log('todo bien pa ', data);
+            return data;
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+export const getData = async (url) => {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    try {
+        const res = await fetch(`${businessUrl}${url}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${userData.access_token}`,
+            }
+        })
+
+        if (!res.ok) {
+            return null;
+        } else {
+            const data = await res.json();
+            return data;
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+export const getDataWithFilter = async (url, filter) => {
+    try {
+        const res = await fetch(`${businessUrl}${url}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(filter)
+        })
+
+        if (!res.ok) {
+            return null;
+        } else {
+            const data = await res.json();
+            return data;
+        }
+    } catch (error) {
+        return error;
+    }
+}
+
+export const postData = async (url, body) => {
+    try {
+        const res = await fetch(`${businessUrl}${url}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body)
+        })
+
+        if (!res.ok) {
+            return null;
+        } else {
+            const data = await res.json();
             return data;
         }
     } catch (error) {

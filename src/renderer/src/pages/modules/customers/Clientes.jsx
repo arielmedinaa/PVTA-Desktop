@@ -1,12 +1,8 @@
-import { useState } from "react";
 import HeaderClientes from "./components/header/HeaderClientes"
 import CardsClientes from "./components/cards/CardsClientes";
 import TablaClientes from "./components/table/TablaClientes";
 
 const Clientes = () => {
-    const [selectedFilter, setSelectedFilter] = useState('All');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const summaryData = [
         { label: 'Total Clientes', value: '$2,307.40', color: 'green', icon: '↑', lastUpdate: 'Last update: Jan 24' },
         { label: 'Total No Contribuyentes', value: '$34,307.40', color: 'blue', icon: '→', lastUpdate: 'Last update: Jan 24' },

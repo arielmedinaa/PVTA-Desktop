@@ -19,7 +19,7 @@ const TablaProductos = ({products, getStatusColor}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {products.map((product) => (
+                    {products?.map((product) => (
                         <tr key={product.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
                             <td className="px-5 py-4">
                                 <input type="checkbox" className="rounded text-blue-600 focus:ring-blue-500" />
@@ -35,14 +35,14 @@ const TablaProductos = ({products, getStatusColor}) => {
                                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                         <img
                                             src={product.image}
-                                            alt={product.name}
+                                            alt={product.nombre}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
-                                    <span className="font-medium">{product.name}</span>
+                                    <span className="font-medium">{product.nombre}</span>
                                 </div>
                             </td>
-                            <td className="px-5 py-4 text-gray-600">{product.category}</td>
+                            <td className="px-5 py-4 text-gray-600">categoria</td>
                             <td className="px-5 py-4">
                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
                                     {product.status}
