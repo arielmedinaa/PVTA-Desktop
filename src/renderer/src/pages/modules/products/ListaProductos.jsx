@@ -36,7 +36,6 @@ const ListaProductos = () => {
 
     useEffect(() => {
         fetchListData('productos');
-
         if(listData){
             setProducts(listData?.dataResponse)
         }

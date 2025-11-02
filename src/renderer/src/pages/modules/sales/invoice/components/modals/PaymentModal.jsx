@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RiCloseLine } from 'react-icons/ri';
 import { FaMoneyBillWave } from 'react-icons/fa';
 import { BsChevronDown } from 'react-icons/bs';
 import { metodoPago } from '../../../../../../core/constants/GlobalUtilsData';
+import CreditDetailsModal from './CreditDetailsModal';
+
 
 const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary }) => {
-  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [selectedMethod, setSelectedMethod] = useState('contado');
   const [amountEntered, setAmountEntered] = useState('');
   const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
+  const [showCreditModal, setShowCreditModal] = useState(false);
+  const [creditDetails, setCreditDetails] = useState(null);
+  const [paymentType, setPaymentType] = useState('Efectivo'); // Added paymentType state
 
   useEffect(() => {
     if (isOpen) {
@@ -46,14 +51,30 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
     }
   };
 
-  // Enfoque al cargar para capturar teclas inmediatamente
   useState(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // If modal is not open, don't render anything
   if (!isOpen) return null;
+
+  const handleMethodSelect = (method) => {
+    setSelectedMethod(method);
+    setPaymentType(method === 'contado' ? 'Efectivo' : 'Crédito');
+    if (method === 'credito') {
+      setShowCreditModal(true);
+    }
+  };
+
+  const handleCreditConfirm = (details) => {
+    setCreditDetails(details);
+    setShowCreditModal(false);
+  };
+
+  const handleBackFromCredit = () => {
+    setShowCreditModal(false);
+    setSelectedMethod('contado');
+  };
 
   const modalOverlayVariants = {
     hidden: { opacity: 0 },
@@ -111,12 +132,11 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
                   <p className="text-gray-600">Order #{customerInfo.orderNumber.split('-').pop()} / {customerInfo.type}</p>
                 </div>
                 <div className="ml-auto text-right">
-                  <p className="text-gray-600">{customerInfo.date.split('•')[0].trim()}</p>
-                  <p className="text-gray-600">{customerInfo.date.split('•')[1].trim()}</p>
+                  <p className="text-gray-600">{customerInfo.date}</p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 shadow-md">
                 <h3 className="text-lg font-medium mb-4">Transaction Details</h3>
                 <div className="space-y-4">
                   {orderItems.map((item, index) => (
@@ -152,34 +172,49 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
               <h3 className="text-lg font-medium mb-4">Select a payment method</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5 mb-8 rounded-3xl bg-gray-50 border border-gray-100 p-2">
-                {metodoPago.map((item, index) => (
-                  <div key={index} className="p-5 rounded-2xl border border-gray-100 bg-white shadow-sm">
-                    <div className="flex items-center mb-2">
-                      <span className={`text-gray-600 mr-2 text-lg`}>{item.label}</span>
+                {metodoPago.map((item, index) => {
+                  const isSelected = selectedMethod === item.label;
+                  const isCredit = item.label === 'credito';
+                  return (
+                    <div 
+                      key={index} 
+                      className={`p-5 rounded-2xl border ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'} shadow-sm cursor-pointer transition-all`}
+                      onClick={() => handleMethodSelect(item.label)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`${isSelected ? 'text-blue-600' : 'text-gray-600'} font-medium text-lg`}>
+                          {item.label.charAt(0).toUpperCase() + item.label.slice(1)}
+                        </span>
+                        {isCredit && creditDetails && (
+                          <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            {creditDetails.installments} cuotas
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="relative mb-6">
                 <div
-                  className="border border-gray-300 rounded-lg p-4 flex justify-between items-center cursor-pointer"
-                  onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                  className={`rounded-lg p-4 flex justify-between items-center ${selectedMethod === 'contado' ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'} shadow-md`}
+                  onClick={() => selectedMethod === 'contado' && setShowPaymentDropdown(!showPaymentDropdown)}
                 >
                   <div className="flex items-center">
                     <FaMoneyBillWave className="text-gray-600 mr-3" size={20} />
-                    <span>{paymentMethod}</span>
+                    <span>{paymentType}</span>
                   </div>
-                  <BsChevronDown className="text-gray-500" />
+                  {selectedMethod === 'contado' && <BsChevronDown className="text-gray-500" />}
                 </div>
 
-                {showPaymentDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                {showPaymentDropdown && selectedMethod === 'contado' && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg z-10">
                     <ul>
                       <li
                         className="p-3 hover:bg-gray-100 cursor-pointer"
                         onClick={() => {
-                          setPaymentMethod('Cash');
+                          setPaymentType('Efectivo');
                           setShowPaymentDropdown(false);
                         }}
                       >
@@ -243,7 +278,7 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
               </div>
 
               <button
-                className="mt-6 bg-blue-400 hover:bg-blue-600 duration-300 text-white font-bold py-4 px-6 rounded-lg"
+                className="mt-6 bg-blue-400 hover:bg-blue-600 duration-300 text-white font-bold py-4 px-6 rounded-lg shadow-md"
                 onClick={() => {
                   const amountPaid = parseFloat(amountEntered) || 0;
                   if (amountPaid >= orderSummary.total) {
@@ -255,12 +290,21 @@ const PaymentModal = ({ isOpen, onClose, customerInfo, orderItems, orderSummary 
                   }
                 }}
               >
-                Pay Now
+                Cobrar
               </button>
             </div>
           </div>
         </div>
       </motion.div>
+      
+      <AnimatePresence>
+        {showCreditModal && (
+          <CreditDetailsModal 
+            onBack={handleBackFromCredit}
+            onConfirm={handleCreditConfirm}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

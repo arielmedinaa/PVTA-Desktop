@@ -24,7 +24,7 @@ const OrderSidebar = ({ cartItems, orderSummary, onUpdateNote }) => {
     name: "Ariel Hikmat",
     orderNumber: "001-001-0000456",
     type: "Dine In",
-    date: "Wed, July 12, 2023 • 06:12 PM",
+    date: new Date().toLocaleString(),
     table: "A4"
   };
 
