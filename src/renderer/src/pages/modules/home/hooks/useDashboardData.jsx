@@ -9,6 +9,7 @@ export const useDashboardData = () => {
   const pendingOrders = [
     { id: 1, orderId: '#ORD-001', customer: 'Juan Pérez', items: 3, amount: 1250.00, time: 'Hace 15 min' },
     { id: 2, orderId: '#ORD-002', customer: 'María García', items: 5, amount: 2750.00, time: 'Hace 32 min' },
+    { id: 3, orderId: '#ORD-003', customer: 'Pedro Rodríguez', items: 2, amount: 1500.00, time: 'Hace 45 min' },
   ];
 
   const timeOptions = [

@@ -95,9 +95,7 @@ const PreviewSection = ({ timeRange, setTimeRange, timeOptions, orders }) => {
             </div>
           </div>
         ))}
-
-        {/* Facturar Button */}
-        <div className="flex items-stretch">
+        {/* <div className="flex items-stretch">
           <button
             onClick={() => console.log('Abrir módulo de ventas')}
             className="flex-1 flex flex-col items-center justify-center bg-blue-500 text-white rounded-xl p-6 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -110,7 +108,7 @@ const PreviewSection = ({ timeRange, setTimeRange, timeOptions, orders }) => {
             <h4 className="font-semibold text-lg mb-1">Facturar</h4>
             <p className="text-white text-sm text-center">Haz click para iniciar una nueva factura</p>
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
     </div>
