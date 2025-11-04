@@ -43,10 +43,10 @@ const TopBar = ({ title, user, isMobile, openSidebar, toggleProfileSidebar }) =>
             <RiSearchLine className="h-5 w-5 text-gray-400" />
           </div>
         </div>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full flex items-center space-x-1 transition-colors">
+        {/* <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full flex items-center space-x-1 transition-colors">
           <RiAddLine className="h-5 w-5" />
           <span className="hidden md:inline">Crear Modulo</span>
-        </button>
+        </button> */}
         <button className="p-2 rounded-full hover:bg-gray-200 transition-colors relative">
           <RiNotification3Line className="h-6 w-6 text-gray-600" />
           <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>

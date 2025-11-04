@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
     if (path.includes('/products')) return 'Products';
     if (path.includes('/customers')) return 'Customers';
     if (path.includes('/shop')) return 'Shop';
-    if (path.includes('/income')) return 'Income';
+    if (path.includes('/income')) return 'Operaciones';
     if (path.includes('/promote')) return 'Promote';
     return 'Dashboard';
   };
@@ -56,7 +56,6 @@ const Layout = ({ children }) => {
         />
       )}
 
-      {/* Sidebar */}
       <div 
         className={`${
           isMobile 

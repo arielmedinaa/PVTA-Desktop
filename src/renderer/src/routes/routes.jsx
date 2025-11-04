@@ -5,6 +5,7 @@ import Dashboard from '../pages/modules/home/Dashboard';
 import ListaProductos from '../pages/modules/products/ListaProductos';
 import SalesPage from '../pages/modules/sales/invoice/FVsales';
 import Clientes from '../pages/modules/customers/Clientes';
+import Operaciones from '../pages/modules/operaciones/Operaciones';
 import { useAuth } from '../core/context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -56,7 +57,7 @@ const routes = [
   },
   {
     path: '/',
-    element: <ProtectedRoute />,
+    //element: <ProtectedRoute />,
     children: [
       {
         path: '/',
@@ -102,17 +103,17 @@ const routes = [
             ]
           },
           // Tienda
-          {
-            path: 'shop',
-            element: <div className="p-4">Tienda</div>
-          },
+          // {
+          //   path: 'shop',
+          //   element: <div className="p-4">Tienda</div>
+          // },
           // Ingresos
           {
             path: 'income',
             children: [
               {
                 index: true,
-                element: <div className="p-4">Resumen de Ingresos</div>
+                element: <Operaciones />
               },
               {
                 path: 'transactions',
@@ -132,7 +133,7 @@ const routes = [
   },
   {
     path: 'sales',
-    element: <ProtectedRoute />,
+    //element: <ProtectedRoute />,
     children: [
       {
         path: '',

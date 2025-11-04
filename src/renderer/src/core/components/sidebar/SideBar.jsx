@@ -43,13 +43,13 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
       path: '/customers',
       hasSubmenu: false
     },
-    {
-      id: 'shop',
-      title: 'Shop',
-      icon: <RiShoppingBag3Line className="w-6 h-6" />,
-      path: '/shop',
-      hasSubmenu: false
-    },
+    // {
+    //   id: 'shop',
+    //   title: 'Shop',
+    //   icon: <RiShoppingBag3Line className="w-6 h-6" />,
+    //   path: '/shop',
+    //   hasSubmenu: false
+    // },
     {
       id: 'income',
       title: 'Operaciones',
@@ -57,13 +57,13 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
       path: '/income',
       hasSubmenu: false
     },
-    {
-      id: 'promote',
-      title: 'Promociones',
-      icon: <RiMegaphoneLine className="w-6 h-6" />,
-      path: '/promote',
-      hasSubmenu: false
-    },
+    // {
+    //   id: 'promote',
+    //   title: 'Promociones',
+    //   icon: <RiMegaphoneLine className="w-6 h-6" />,
+    //   path: '/promote',
+    //   hasSubmenu: false
+    // },
     {
       id: 'sales',
       title: 'Sales',
