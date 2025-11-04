@@ -92,7 +92,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
                     <input
                       type="text"
                       id="productName"
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full p-3 border border-gray-300 rounded-full"
                       placeholder="Enter product name"
                       value={productName}
                       onChange={(e) => setProductName(e.target.value)}
@@ -105,7 +105,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
                     <input
                       type="text"
                       id="productCode"
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full p-3 border border-gray-300 rounded-full"
                       placeholder="Enter product code"
                       value={productCode}
                       onChange={(e) => setProductCode(e.target.value)}
@@ -118,7 +118,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
                     <div className="flex space-x-2">
                       <select
                         id="category"
-                        className="flex-1 p-3 border border-gray-300 rounded-md"
+                        className="flex-1 p-3 border border-gray-300 rounded-full"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                       >
@@ -210,7 +210,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   id="categoryName"
-                  className="w-full p-3 border border-gray-300 rounded-md"
+                  className="w-full p-3 border border-gray-300 rounded-full"
                   placeholder="Enter category name"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}

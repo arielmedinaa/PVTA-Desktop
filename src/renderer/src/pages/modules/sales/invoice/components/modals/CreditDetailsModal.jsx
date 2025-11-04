@@ -68,13 +68,13 @@ const CreditDetailsModal = ({ onBack, onConfirm }) => {
           <div className="mt-8 flex justify-between">
             <button
               onClick={onBack}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50"
             >
               Volver
             </button>
             <button
               onClick={() => onConfirm({ installments, firstDueDate })}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
             >
               Confirmar
             </button>

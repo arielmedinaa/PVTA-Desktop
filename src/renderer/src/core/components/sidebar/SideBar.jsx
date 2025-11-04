@@ -120,7 +120,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
                 }`}
               >
                 <div className="flex items-center flex-1">
-                  <span className={isActive(item.path) ? "text-blue-500" : "text-gray-500"}>
+                  <span className={isActive(item.path) ? "text-gray-600" : "text-gray-500"}>
                     {item.icon}
                   </span>
                   {!collapsed && (

@@ -82,13 +82,13 @@ const PreviewSection = ({ timeRange, setTimeRange, timeOptions, orders }) => {
             <div className="mt-4 flex space-x-2">
               <button 
                 onClick={() => handleInvoice(order.orderId)}
-                className="flex-1 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors"
+                className="flex-1 py-2 bg-slate-50 shadow-sm border border-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors"
               >
                 Facturar
               </button>
               <button 
                 onClick={() => handleViewDetails(order.orderId)}
-                className="flex-1 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors"
+                className="flex-1 py-2 bg-white shadow-sm text-gray-700 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors"
               >
                 Ver Detalles
               </button>
