@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { RiMore2Line } from "react-icons/ri";
+import { SlOptionsVertical } from "react-icons/sl";
 
 const DropdownMenu = ({
   options,
-  triggerIcon: TriggerIcon = RiMore2Line,
+  triggerIcon: TriggerIcon = SlOptionsVertical,
   triggerClassName = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +39,7 @@ const DropdownMenu = ({
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${triggerClassName}`}
+        className={`p-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-full text-center transition-colors focus:outline-none ${triggerClassName}`}
       >
         <TriggerIcon className="w-5 h-5" />
       </button>
@@ -50,7 +50,7 @@ const DropdownMenu = ({
             className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            exit={{ opacity: 0, scale: 0.95, y: -5 }}
             transition={{
               duration: 0.15,
               ease: "easeOut",
@@ -81,10 +81,10 @@ const DropdownMenu = ({
                     className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
                       isDisabled
                         ? "text-gray-400 cursor-not-allowed"
-                        : `${option.textColor || "text-gray-700"} hover:bg-gray-100`
+                        : `${option.textColor || "text-gray-700"} hover:bg-gray-100 rounded-lg`
                     }`}
                     role="menuitem"
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -1 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
                       delay: index * 0.03,

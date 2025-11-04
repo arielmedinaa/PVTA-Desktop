@@ -371,8 +371,8 @@ const Operaciones = () => {
                         <tr key={payment.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-blue-600 font-medium">
+                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                <span className="text-gray-600 font-medium">
                                   {payment.cliente.nombre.charAt(0)}
                                 </span>
                               </div>
@@ -420,6 +420,7 @@ const Operaciones = () => {
                                   label: "Pagar",
                                   onClick: () => handleOpenPaymentModal(payment),
                                   icon: RiMoneyDollarCircleFill,
+                                  visible: payment.estado === "Pendiente" || payment.estado === "Parcial" || payment.estado === "Vencido",
                                 },
                               ]}
                             />
