@@ -48,7 +48,6 @@ const Layout = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div 
           className="fixed inset-0 z-20 bg-black bg-opacity-50 transition-opacity lg:hidden"
@@ -81,7 +80,6 @@ const Layout = ({ children }) => {
           toggleProfileSidebar={toggleProfileSidebar}
         />
 
-        {/* Content area with animations */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">
           <AnimatePresence mode="wait">
             <motion.div
@@ -98,7 +96,6 @@ const Layout = ({ children }) => {
         </main>
       </div>
 
-      {/* Profile Sidebar */}
       <ProfileSidebar
         isOpen={profileSidebarOpen} 
         onClose={() => setProfileSidebarOpen(false)} 

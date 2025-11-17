@@ -57,7 +57,7 @@ const routes = [
   },
   {
     path: '/',
-    //element: <ProtectedRoute />,
+    element: <ProtectedRoute />,
     children: [
       {
         path: '/',
@@ -133,7 +133,7 @@ const routes = [
   },
   {
     path: 'sales',
-    //element: <ProtectedRoute />,
+    element: <ProtectedRoute />,
     children: [
       {
         path: '',

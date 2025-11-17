@@ -11,10 +11,25 @@ import {
   RiCalendarLine,
   RiInformationLine,
   RiCheckLine,
+  RiAlertLine,
 } from "react-icons/ri";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
 import ModalCreatePayment from "./components/modal/ModalCreatePayment";
 import DropdownMenu from "../../../core/components/dropdown/DropDown";
+import { FiAlertCircle } from "react-icons/fi";
+
+const getStatusIcon = (estado) => {
+  switch(estado.toLowerCase()) {
+    case 'completado':
+      return <RiCheckboxCircleLine className="mr-1 h-6 w-6" />;
+    case 'parcial':
+      return <RiTimeLine className="mr-1 h-4 w-4" />;
+    case 'pendiente':
+      return <RiAlertLine className="mr-1 h-4 w-4" />;
+    default:
+      return <FiAlertCircle className="mr-1 h-4 w-4" />;
+  }
+};
 
 const Operaciones = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -161,15 +176,15 @@ const Operaciones = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "Pendiente":
-        return "bg-amber-100 text-amber-800";
+        return "bg-amber-50 text-amber-800 border border-amber-800 flex items-center w-28";
       case "Completado":
-        return "bg-green-100 text-green-800";
+        return "bg-green-50 text-green-800 border border-green-800 flex items-center w-28";
       case "Parcial":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-50 text-blue-800 border border-blue-800 flex items-center w-28";
       case "Vencido":
-        return "bg-red-100 text-red-800";
+        return "bg-red-50 text-red-800 border border-red-800 flex items-center w-28";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-50 text-gray-800 border border-gray-800 flex items-center w-28";
     }
   };
 
@@ -403,8 +418,9 @@ const Operaciones = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(payment.estado)}`}
+                              className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full items-center ${getStatusBadge(payment.estado)}`}
                             >
+                            {getStatusIcon(payment.estado)}
                               {payment.estado}
                             </span>
                           </td>
