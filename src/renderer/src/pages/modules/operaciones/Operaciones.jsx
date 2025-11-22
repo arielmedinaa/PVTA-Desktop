@@ -1,22 +1,16 @@
 import React, { useState } from "react";
 import {
-  RiSearchLine,
-  RiFilterLine,
   RiMoneyDollarCircleLine,
   RiCheckboxCircleLine,
   RiTimeLine,
   RiCloseCircleLine,
-  RiEyeLine,
-  RiMoneyDollarCircleFill,
-  RiCalendarLine,
-  RiInformationLine,
-  RiCheckLine,
   RiAlertLine,
 } from "react-icons/ri";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
-import ModalCreatePayment from "./components/modal/ModalCreatePayment";
-import DropdownMenu from "../../../core/components/dropdown/DropDown";
+import PaymentModal from "./components/modal/PaymentModal";
 import { FiAlertCircle } from "react-icons/fi";
+import TableCobros from "./components/table/TableCobros";
+import FilterCobros from "./components/filters/FilterCobros";
 
 const getStatusIcon = (estado) => {
   switch(estado.toLowerCase()) {
@@ -286,186 +280,24 @@ const Operaciones = () => {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden mb-8">
-            <div className="p-5 border-b border-gray-100 flex flex-wrap justify-between gap-3">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "all" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setActiveTab("all")}
-                >
-                  Todos
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "pending" ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setActiveTab("pending")}
-                >
-                  Pendientes
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "partial" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setActiveTab("partial")}
-                >
-                  Parciales
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "completed" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setActiveTab("completed")}
-                >
-                  Completados
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === "expired" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setActiveTab("expired")}
-                >
-                  Vencidos
-                </button>
-              </div>
+            <FilterCobros
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
 
-              <div className="flex space-x-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Buscar por cliente o referencia..."
-                    className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <RiSearchLine className="h-5 w-5 text-gray-400" />
-                  </div>
-                </div>
+            <TableCobros
+              filteredPayments={filteredPayments}
+              searchQuery={searchQuery}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              getStatusBadge={getStatusBadge}
+              getStatusIcon={getStatusIcon}
+              handleViewPayment={handleViewPayment}
+              handleOpenPaymentModal={handleOpenPaymentModal}
+            />
 
-                <button className="p-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50">
-                  <RiFilterLine className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Cliente
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Referencia
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha Vencimiento
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Monto Total
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Pagado
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Pendiente
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPayments.length > 0 ? (
-                    filteredPayments
-                      .filter(
-                        (payment) =>
-                          payment.cliente.nombre
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase()) ||
-                          payment.referencia
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase()),
-                      )
-                      .map((payment) => (
-                        <tr key={payment.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                <span className="text-gray-600 font-medium">
-                                  {payment.cliente.nombre.charAt(0)}
-                                </span>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {payment.cliente.nombre}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {payment.cliente.telefono}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {payment.referencia}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {formatDate(payment.fechaVencimiento)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {formatCurrency(payment.montoTotal)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                            {formatCurrency(payment.montoPagado)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-amber-600">
-                            {formatCurrency(payment.montoPendiente)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full items-center ${getStatusBadge(payment.estado)}`}
-                            >
-                            {getStatusIcon(payment.estado)}
-                              {payment.estado}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <DropdownMenu
-                              options={[
-                                {
-                                  label: "Ver",
-                                  onClick: () => handleViewPayment(payment),
-                                  icon: RiEyeLine,
-                                },
-                                {
-                                  label: "Pagar",
-                                  onClick: () => handleOpenPaymentModal(payment),
-                                  icon: RiMoneyDollarCircleFill,
-                                  visible: payment.estado === "Pendiente" || payment.estado === "Parcial" || payment.estado === "Vencido",
-                                },
-                              ]}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="8"
-                        className="px-6 py-8 text-center text-gray-500"
-                      >
-                        <div className="flex flex-col items-center justify-center">
-                          <RiMoneyDollarCircleLine className="h-12 w-12 text-gray-300 mb-2" />
-                          <p className="text-sm font-medium">
-                            No se encontraron cobros
-                          </p>
-                          <p className="text-xs mt-1">
-                            Intenta con otros filtros de búsqueda
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Paginación */}
             <div className="px-6 py-4 border-t border-gray-200">
               <Paginacion1 data={filteredPayments} itemsPerPage={5} />
             </div>
@@ -473,141 +305,21 @@ const Operaciones = () => {
         </div>
       </div>
 
-      {paymentModalOpen && selectedPayment && (
-        <ModalCreatePayment
-          isOpen={paymentModalOpen}
-          onClose={() => setPaymentModalOpen(false)}
-          title={`Registrar Pago - ${selectedPayment.referencia}`}
-        >
-          <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <RiInformationLine className="h-5 w-5 text-blue-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-blue-800">
-                    Detalles del cobro
-                  </h3>
-                  <div className="mt-2 text-sm text-blue-700 space-y-1">
-                    <p>
-                      <span className="font-medium">Cliente:</span>{" "}
-                      {selectedPayment.cliente.nombre}
-                    </p>
-                    <p>
-                      <span className="font-medium">Total:</span>{" "}
-                      {formatCurrency(selectedPayment.montoTotal)}
-                    </p>
-                    <p>
-                      <span className="font-medium">Pagado:</span>{" "}
-                      {formatCurrency(selectedPayment.montoPagado)}
-                    </p>
-                    <p className="font-semibold">
-                      <span className="font-medium">Pendiente:</span>{" "}
-                      {formatCurrency(selectedPayment.montoPendiente)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monto a pagar
-                </label>
-                <div className="mt-1 relative rounded-full shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-full p-2 border"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0.01"
-                    max={selectedPayment.montoPendiente}
-                  />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">PYG</span>
-                  </div>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Máximo: {formatCurrency(selectedPayment.montoPendiente)}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Método de pago
-                </label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-full border p-2"
-                >
-                  <option value="efectivo">Efectivo</option>
-                  <option value="transferencia">Transferencia bancaria</option>
-                  <option value="tarjeta_credito">Tarjeta de crédito</option>
-                  <option value="tarjeta_debito">Tarjeta de débito</option>
-                  <option value="mercadopago">Mercado Pago</option>
-                  <option value="otro">Otro</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 ">
-                  Fecha del pago
-                </label>
-                <div className="mt-1 relative rounded-full shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <RiCalendarLine className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="date"
-                    value={paymentDate}
-                    onChange={(e) => setPaymentDate(e.target.value)}
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-full p-2 border"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nota (opcional)
-                </label>
-                <textarea
-                  rows="3"
-                  value={paymentNote}
-                  onChange={(e) => setPaymentNote(e.target.value)}
-                  className="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2 resize-none"
-                  placeholder="Agregar una nota o referencia para este pago"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={() => setPaymentModalOpen(false)}
-                className="bg-white py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleProcessPayment}
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <RiCheckLine className="-ml-1 mr-2 h-5 w-5" />
-                Registrar pago
-              </button>
-            </div>
-          </div>
-        </ModalCreatePayment>
-      )}
+      <PaymentModal
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        selectedPayment={selectedPayment}
+        paymentAmount={paymentAmount}
+        setPaymentAmount={setPaymentAmount}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        paymentDate={paymentDate}
+        setPaymentDate={setPaymentDate}
+        paymentNote={paymentNote}
+        setPaymentNote={setPaymentNote}
+        handleProcessPayment={handleProcessPayment}
+        formatCurrency={formatCurrency}
+      />
     </>
   );
 };
