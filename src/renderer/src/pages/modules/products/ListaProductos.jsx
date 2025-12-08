@@ -4,10 +4,10 @@ import { RiSearchLine, RiFilterLine } from "react-icons/ri";
 import TablaProductos from "./components/table/TablaProductos";
 import Header from "./components/header/HeaderListaProductos";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
-import { useListData } from "../../../core/hooks/useListData";
+//import { useListData } from "../../../core/hooks/useListData";
 
 const ListaProductos = () => {
-  const { fetchListData, listData } = useListData();
+  //const { fetchListData, listData } = useListData();
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [products, setProducts] = useState([
     {
@@ -148,7 +148,7 @@ const ListaProductos = () => {
                     key={filter}
                     className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
                       selectedFilter === filter
-                        ? "bg-blue-500 text-white"
+                        ? "bg-slate-800 text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                     onClick={() => setSelectedFilter(filter)}

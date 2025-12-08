@@ -7,7 +7,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
   return (
     <motion.div
-      className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 p-3"
+      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-3"
       whileHover={{ y: -2, transition: { duration: 0.2 } }}
     >
       <div className="relative h-40 rounded-xl bg-gray-100">

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  RiInformationLine, 
-  RiCalendarLine, 
+import { MdOutlinePayment } from "react-icons/md";
+import {
   RiCheckLine,
   RiMoneyDollarBoxLine,
   RiBankCardLine,
@@ -28,7 +27,7 @@ const PaymentModal = ({
   formatCurrency,
 }) => {
   const [receivedAmount, setReceivedAmount] = useState('');
-  
+
   const calculateChange = () => {
     if (!receivedAmount || isNaN(parseFloat(receivedAmount))) return 0;
     return (parseFloat(receivedAmount) - parseFloat(paymentAmount || 0)).toFixed(2);
@@ -42,6 +41,7 @@ const PaymentModal = ({
       onClose={onClose}
       title={`Registrar Cobro - ${selectedPayment.referencia}`}
       size="xl"
+      iconTitle={<MdOutlinePayment size={25} className='text-gray-700' />}
     >
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full lg:w-1/2 space-y-6">
@@ -49,7 +49,7 @@ const PaymentModal = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Método de Cobro
             </h3>
-            
+
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-3xl border border-gray-100 p-3">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -93,11 +93,10 @@ const PaymentModal = ({
                       key={method.id}
                       type="button"
                       onClick={() => setPaymentMethod(method.id)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-2xl border ${
-                        paymentMethod === method.id
+                      className={`flex flex-col items-center justify-center p-3 rounded-2xl border ${paymentMethod === method.id
                           ? 'border-blue-500 bg-white shadow-sm'
                           : 'border-gray-100 bg-white shadow-sm'
-                      } transition-colors`}
+                        } transition-colors`}
                     >
                       <span className="text-2xl mb-1">{method.icon}</span>
                       <span className="text-sm font-medium text-gray-700">
@@ -184,34 +183,17 @@ const PaymentModal = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex justify-center rounded-full border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleProcessPayment}
-              className="inline-flex justify-center rounded-full border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <RiCheckLine className="-ml-1 mr-2 h-5 w-5" />
-              Confirmar Pago
-            </button>
-          </div>
         </div>
-        <div className="w-full lg:w-1/2">
+        <div className="w-full lg:w-1/2 flex flex-col justify-between">
           <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Detalles del Cliente
             </h3>
-            
+
             <div className="space-y-4">
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-2xl shadow-sm">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 font-medium">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center">
+                  <span className="text-white font-medium">
                     {selectedPayment.cliente.nombre.charAt(0)}
                   </span>
                 </div>
@@ -261,7 +243,7 @@ const PaymentModal = ({
                   <div className="space-y-2">
                     {selectedPayment.cuotas && selectedPayment.cuotas.length > 0 ? (
                       selectedPayment.cuotas.map((cuota, index) => (
-                        <div 
+                        <div
                           key={index}
                           className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
                         >
@@ -279,15 +261,14 @@ const PaymentModal = ({
                             </p>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <span className={`text-sm font-medium ${
-                              cuota.estado === 'pendiente' ? 'text-yellow-600' : 
-                              cuota.estado === 'vencida' ? 'text-red-600' : 'text-green-600'
-                            }`}>
-                              {cuota.estado === 'pendiente' ? 'Pendiente' : 
-                               cuota.estado === 'vencida' ? 'Vencida' : 'Pagada'}
+                            <span className={`text-sm font-medium ${cuota.estado === 'pendiente' ? 'text-yellow-600' :
+                                cuota.estado === 'vencida' ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                              {cuota.estado === 'pendiente' ? 'Pendiente' :
+                                cuota.estado === 'vencida' ? 'Vencida' : 'Pagada'}
                             </span>
                             {cuota.estado === 'pendiente' && (
-                              <button 
+                              <button
                                 className="p-1 text-blue-600 hover:bg-blue-50 rounded-full"
                                 onClick={() => setPaymentAmount(cuota.monto)}
                                 title="Seleccionar monto"
@@ -330,7 +311,7 @@ const PaymentModal = ({
                           </p>
                         </div>
                         <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full border border-green-800 flex items-center">
-                            <RiCheckboxCircleLine className="mr-1 h-3 w-3" />
+                          <RiCheckboxCircleLine className="mr-1 h-3 w-3" />
                           Completado
                         </span>
                       </div>
@@ -345,6 +326,23 @@ const PaymentModal = ({
                 </div>
               </div>
             </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex justify-center rounded-full border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleProcessPayment}
+              className="inline-flex justify-center rounded-full border border-transparent bg-slate-800 py-2 px-4 text-sm font-medium text-white shadow-sm"
+            >
+              <RiCheckLine className="-ml-1 mr-2 h-5 w-5" />
+              Confirmar Pago
+            </button>
           </div>
         </div>
       </div>

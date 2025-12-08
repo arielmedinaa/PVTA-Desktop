@@ -6,7 +6,7 @@ import {
   RiDashboardLine, 
   RiProductHuntLine, 
   RiUserLine, 
-  RiShoppingBag3Line, 
+  RiStockLine, 
   RiLineChartLine,
   RiMegaphoneLine,
   RiArrowDownSLine,
@@ -18,7 +18,7 @@ import {
 const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [hoveredMenu, setHoveredMenu] = useState(null);
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const menuItems = [
@@ -57,13 +57,13 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
       path: '/income',
       hasSubmenu: false
     },
-    // {
-    //   id: 'promote',
-    //   title: 'Promociones',
-    //   icon: <RiMegaphoneLine className="w-6 h-6" />,
-    //   path: '/promote',
-    //   hasSubmenu: false
-    // },
+    {
+      id: 'stock',
+      title: 'Stock',
+      icon: <RiStockLine className="w-6 h-6" />,
+      path: '/stock',
+      hasSubmenu: false
+    },
     {
       id: 'sales',
       title: 'Sales',
@@ -74,7 +74,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
   ];
 
   const isActive = (path) => {
-    return activeRoute && activeRoute.startsWith(path);
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   const handleMouseEnter = (menuId) => {
@@ -115,7 +115,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeRoute = '/' }) => {
             >
               <Link
                 to={item.path}
-                className={`flex items-center w-full p-3 text-left rounded-lg transition-all duration-200 ${
+                className={`flex items-center w-full p-3 text-left rounded-2xl transition-all duration-200 ${
                   isActive(item.path) ? 'bg-white bg-opacity-80 shadow-sm' : 'hover:bg-white hover:bg-opacity-60'
                 }`}
               >

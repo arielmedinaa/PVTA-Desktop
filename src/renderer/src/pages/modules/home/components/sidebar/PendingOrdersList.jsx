@@ -47,7 +47,7 @@ const PendingOrdersList = ({ orders, setSelectedOrder }) => {
               </div>
               <button
                 onClick={e => { e.stopPropagation(); handleInvoice(order.orderId); }}
-                className="px-4 py-1.5 bg-blue-500 hover:bg-blue-700 text-white text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                className="px-4 py-1.5 bg-gray-600 hover:bg-slate-900 text-white text-xs font-medium rounded-full transition-colors whitespace-nowrap"
               >
                 Facturar
               </button>

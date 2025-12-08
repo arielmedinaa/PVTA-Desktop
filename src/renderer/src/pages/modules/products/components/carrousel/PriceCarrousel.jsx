@@ -103,7 +103,7 @@ const PriceCarousel = ({ prices, setPrices, maxPrices = 5 }) => {
   };
 
   return (
-    <div className='bg-white rounded-xl shadow-md p-4'>
+    <div className='bg-white rounded-2xl shadow-md p-4'>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">Price List</h3>
         <div className="text-sm text-gray-500">
@@ -111,7 +111,7 @@ const PriceCarousel = ({ prices, setPrices, maxPrices = 5 }) => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-2 rounded-2xl">
         <button 
           type="button"
           onClick={prevPrice}
@@ -190,7 +190,7 @@ const PriceCarousel = ({ prices, setPrices, maxPrices = 5 }) => {
                   <label className="block mb-1 text-sm">Price Name</label>
                   <input
                     type="text"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-2 border border-gray-300 rounded-2xl"
                     placeholder="e.g. Retail Price"
                     value={price.name}
                     onChange={(e) => updatePriceItem(index, 'name', e.target.value)}
@@ -204,7 +204,7 @@ const PriceCarousel = ({ prices, setPrices, maxPrices = 5 }) => {
                     type="number"
                     step="0.01"
                     min="0"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-2 border border-gray-300 rounded-2xl"
                     placeholder="0.00"
                     value={price.amount}
                     onChange={(e) => updatePriceItem(index, 'amount', e.target.value)}
@@ -215,7 +215,7 @@ const PriceCarousel = ({ prices, setPrices, maxPrices = 5 }) => {
                 <div>
                   <label className="block mb-1 text-sm">Tax Rate (%)</label>
                   <select
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-2 border border-gray-300 rounded-2xl"
                     value={price.tax}
                     onChange={(e) => updatePriceItem(index, 'tax', Number(e.target.value))}
                   >

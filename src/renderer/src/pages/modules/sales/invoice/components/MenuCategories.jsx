@@ -7,9 +7,9 @@ const MenuCategories = ({ categories, activeCategory, setActiveCategory }) => {
         <div
           key={category.id}
           onClick={() => setActiveCategory(category.name)}
-          className={`p-4 rounded-lg cursor-pointer transition-colors ${
+          className={`p-4 rounded-2xl cursor-pointer transition-colors ${
             activeCategory === category.name
-              ? 'bg-blue-400 text-blue-100'
+              ? 'bg-slate-800 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
           }`}
         >

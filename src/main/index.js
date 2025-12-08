@@ -1,19 +1,30 @@
-import { app, shell, BrowserWindow, ipcMain, net } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, net, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1024,
+    height: 700,
+    minWidth: 800,
+    minHeight: 600,
     show: false,
-    autoHideMenuBar: true,
+    frame: false, // Deshabilitar el marco nativo
+    titleBarStyle: 'hidden', // Ocultar la barra de título nativa
+    titleBarOverlay: {
+      color: '#2d2d2d', // Color de fondo de la barra de título personalizada
+      symbolColor: '#ffffff', // Color de los símbolos de la barra de título
+      height: 28 // Altura de la barra de título personalizada
+    },
+    backgroundColor: '#2d2d2d', // Color de fondo de la ventana
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      webSecurity: true
+      webSecurity: true,
+      nodeIntegration: true,
+      contextIsolation: false
     }
   })
 
@@ -47,6 +58,38 @@ function createWindow() {
 app.commandLine.appendSwitch('ignore-certificate-errors');
 
 app.whenReady().then(() => {
+  // Manejar eventos de la ventana desde el renderer
+  ipcMain.on('minimize-window', () => {
+    const window = BrowserWindow.getFocusedWindow();
+    if (window) window.minimize();
+  });
+
+  ipcMain.on('maximize-window', () => {
+    const window = BrowserWindow.getFocusedWindow();
+    if (window) window.maximize();
+  });
+
+  ipcMain.on('unmaximize-window', () => {
+    const window = BrowserWindow.getFocusedWindow();
+    if (window) window.unmaximize();
+  });
+
+  ipcMain.on('close-window', () => {
+    const window = BrowserWindow.getFocusedWindow();
+    if (window) window.close();
+  });
+
+  // Manejar el evento de cambio de tamaño de la ventana
+  const updateMaximizeState = (window) => {
+    if (window) {
+      window.webContents.send('window-state-changed', window.isMaximized());
+    }
+  };
+
+  app.on('browser-window-created', (_, window) => {
+    window.on('maximize', () => updateMaximizeState(window));
+    window.on('unmaximize', () => updateMaximizeState(window));
+  });
   app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
     if (url.startsWith('http://localhost:8000/')) {
       event.preventDefault();

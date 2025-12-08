@@ -8,25 +8,25 @@ const Paginacion1 = ({data}) => {
                 Showing 1-{data?.length} of 134 entries
             </div>
             <div className="flex space-x-2">
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     <RiArrowLeftLine className="w-4 h-4" />
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-transparent bg-blue-500 text-white font-medium">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-transparent bg-slate-800 text-white font-medium">
                     1
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     2
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     3
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
                     ...
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     12
                 </button>
-                <button className="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <button className="w-9 h-9 flex items-center justify-center rounded-3xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     <RiArrowRightLine className="w-4 h-4" />
                 </button>
             </div>

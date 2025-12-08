@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { SlOptionsVertical } from "react-icons/sl";
+import { RiMore2Line } from "react-icons/ri";
 
 const DropdownMenu = ({
   options,
-  triggerIcon: TriggerIcon = SlOptionsVertical,
+  triggerIcon,
   triggerClassName = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,13 +41,13 @@ const DropdownMenu = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`p-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-full text-center transition-colors focus:outline-none ${triggerClassName}`}
       >
-        <TriggerIcon className="w-5 h-5" />
+        <RiMore2Line className="w-5 h-5" />
       </button>
 
       <AnimatePresence>
         {isOpen && visibleOptions.length > 0 && (
           <motion.div
-            className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+            className="origin-top-right absolute right-0 mt-2 w-56 rounded-2xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -5 }}

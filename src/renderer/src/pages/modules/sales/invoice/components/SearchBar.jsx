@@ -8,7 +8,7 @@ const SearchBar = ({ searchTerm, setSearchTerm }) => {
         placeholder="Search a dishes"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full py-2 px-4 pl-10 shadow-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full py-2 px-4 pl-10 shadow-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
         <button className="p-1 text-gray-400">

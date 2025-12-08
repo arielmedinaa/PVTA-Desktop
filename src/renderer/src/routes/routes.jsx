@@ -6,6 +6,7 @@ import ListaProductos from '../pages/modules/products/ListaProductos';
 import SalesPage from '../pages/modules/sales/invoice/FVsales';
 import Clientes from '../pages/modules/customers/Clientes';
 import Operaciones from '../pages/modules/operaciones/Operaciones';
+import Stock from '../pages/modules/stock/Stock';
 import { useAuth } from '../core/context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -101,6 +102,10 @@ const routes = [
                 element: <div className="p-4">Segmentos de Clientes</div>
               }
             ]
+          },
+          {
+            path: 'stock',
+            element: <Stock />
           },
           // Tienda
           // {

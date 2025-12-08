@@ -8,6 +8,7 @@ const ModalCreatePayment = ({
   title,
   children,
   size = "md",
+  iconTitle,
 }) => {
   if (!isOpen) return null;
 
@@ -27,7 +28,7 @@ const ModalCreatePayment = ({
               &#8203;
             </span>
             <motion.div
-              className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle ${sizes[size]} sm:w-full`}
+              className={`inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle ${sizes[size]} sm:w-full`}
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-headline"
@@ -43,7 +44,12 @@ const ModalCreatePayment = ({
             >
               <div className="bg-white p-6">
                 <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <div className="bg-gray-100 p-2 rounded-full">
+                      {iconTitle}
+                    </div>
+                    {title}
+                  </h3>
                   <button
                     onClick={onClose}
                     className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"

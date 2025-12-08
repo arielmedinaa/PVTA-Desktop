@@ -17,17 +17,17 @@ const FilterOptionsSales = () => {
     { 
       id: 'discount', 
       label: 'Descuento', 
-      icon: <FiPercent className="text-blue-500 mr-1" />,
+      icon: <FiPercent className="text-amber-500 mr-1" />,
     },
     { 
       id: 'retention', 
       label: 'Retención', 
-      icon: <FiCreditCard className="text-blue-500 mr-1" />,
+      icon: <FiCreditCard className="text-amber-500 mr-1" />,
     },
     { 
       id: 'cashWithdrawal', 
       label: 'Retiro', 
-      icon: <FiDollarSign className="text-blue-500 mr-1" />,
+      icon: <FiDollarSign className="text-amber-500 mr-1" />,
     }
   ];
 
@@ -38,7 +38,7 @@ const FilterOptionsSales = () => {
           <button
             key={option.id}
             onClick={() => handleOptionClick(option.id)}
-            className="flex items-center px-3 py-1.5 bg-white rounded-lg shadow-sm text-sm text-gray-700 hover:bg-blue-50 border border-gray-200"
+            className="flex items-center px-3 py-1.5 bg-white rounded-2xl shadow-sm text-sm text-gray-700 hover:bg-blue-50 border border-gray-200"
           >
             {option.icon}
             <span>{option.label}</span>
@@ -47,7 +47,7 @@ const FilterOptionsSales = () => {
       </div>
       <button
         onClick={toggleMenu}
-        className={`w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm transition-colors ${isOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-400 hover:bg-gray-50'}`}
+        className={`w-10 h-10 flex items-center justify-center rounded-2xl bg-white shadow-sm transition-colors ${isOpen ? 'bg-blue-50 text-slate-600' : 'text-slate-400 hover:bg-gray-50'}`}
       >
         <FiGrid className="w-5 h-5" />
       </button>

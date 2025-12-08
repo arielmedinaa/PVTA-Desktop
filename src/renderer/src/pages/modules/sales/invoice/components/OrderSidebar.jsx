@@ -43,14 +43,14 @@ const OrderSidebar = ({ cartItems, orderSummary, onUpdateNote }) => {
         initial="hidden"
         animate="visible"
       >
-        <div className="bg-white rounded-xl p-6 shadow-sm h-full flex flex-col">
+        <div className="bg-white rounded-3xl p-6 shadow-sm h-full flex flex-col">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-xl font-semibold">{customerInfo.name}</h2>
               <p className="text-gray-500 text-sm">Order {customerInfo.orderNumber} / {customerInfo.type}</p>
               <p className="text-gray-500 text-sm">{customerInfo.date}</p>
             </div>
-            <button className="bg-blue-500 text-white h-10 w-10 rounded-md flex items-center justify-center">
+            <button className="bg-slate-800 text-white h-10 w-10 rounded-md flex items-center justify-center">
               {customerInfo.table}
             </button>
           </div>
@@ -77,7 +77,7 @@ const OrderSidebar = ({ cartItems, orderSummary, onUpdateNote }) => {
             </div>
           </div>
 
-          <button className="w-full py-3 bg-blue-400 hover:bg-blue-500 text-blue-100 rounded-lg font-semibold flex items-center justify-between" onClick={() => setIsPaymentModalOpen(true)}>
+          <button className="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold flex items-center justify-between" onClick={() => setIsPaymentModalOpen(true)}>
             <span className="ml-4">${orderSummary.total.toFixed(2)}</span>
             <span className="flex items-center mr-4">
               Confirmar Orden
