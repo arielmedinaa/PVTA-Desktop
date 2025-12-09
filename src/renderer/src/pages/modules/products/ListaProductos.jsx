@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ModalCreateProd from "./components/modals/modalCreateProducts";
 import { RiSearchLine, RiFilterLine } from "react-icons/ri";
 
@@ -16,41 +16,58 @@ const ListaProductos = () => {
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const initialFilter = useMemo(() => ({
+    codigo: "",
+    descripcion: "",
+    categoria: "",
+    marca: "",
+    precioini: "",
+    preciofin: "",
+    limit: itemsPerPage,
+    offset: 0,
+    orden: "codigo",
+    tipOrden: "ASC",
+  }), [itemsPerPage]);
+
   const {
     productos,
     total,
     setFilter,
-    filter,
-    listarProductosPorFiltro
-  } = useListProductos(
-    {
-      codigo: "",
-      descripcion: "",
-      categoria: "",
-      marca: "",
-      precioini: "",
-      preciofin: "",
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage,
-      orden: "codigo",
-      tipOrden: "ASC",
-    },
-    { callBack: true }
-  );
+  } = useListProductos(initialFilter, { callBack: true });
 
-  const 
-  { 
-    filters: searchFilter,
+  const {
     searchTerm,
-    isSearching,
     handleSearchChange,
-    handleFilterChange,
-    resetSearch 
+    isSearching
   } = useSearch({
-      onSearch: listarProductosPorFiltro,
-      debounceDelay: 300,
-      initialFilter: filter
-    });
+    onSearch: useCallback((searchParams) => {
+      setFilter(prev => {
+        const newFilter = {
+          ...prev,
+          ...searchParams,
+          offset: 0,
+          limit: itemsPerPage
+        };
+        if (searchParams.codigo === undefined) {
+          newFilter.codigo = "";
+        } else if (searchParams.codigo === "") {
+          newFilter.codigo = "";
+        }
+        return newFilter;
+      });
+      setCurrentPage(1);
+    }, [setFilter, itemsPerPage]),
+    debounceDelay: 500,
+    searchField: 'codigo'
+  });
+
+  useEffect(() => {
+    setFilter(prev => ({
+      ...prev,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage
+    }));
+  }, [currentPage, itemsPerPage, setFilter]);
 
   const [products, setProducts] = useState(productos);
   const summaryData = [
@@ -100,6 +117,14 @@ const ListaProductos = () => {
   const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
   useEffect(() => {
+    setFilter(prev => ({
+      ...prev,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage
+    }));
+  }, [currentPage, itemsPerPage, setFilter]);
+
+  useEffect(() => {
     if (productos) {
       setProducts(productos);
     }
@@ -110,7 +135,8 @@ const ListaProductos = () => {
   };
 
   const handlePageSizeChange = (newSize) => {
-    setItemsPerPage(Number(newSize));
+    const newPageSize = Number(newSize);
+    setItemsPerPage(newPageSize);
     setCurrentPage(1);
   };
 
@@ -143,7 +169,7 @@ const ListaProductos = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    name="descripcion"
+                    name="codigo"
                     placeholder="Buscar por descripción..."
                     className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={searchTerm}
