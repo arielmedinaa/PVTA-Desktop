@@ -1,24 +1,27 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import ModalCreateProd from "./components/modals/modalCreateProducts";
 import { RiSearchLine, RiFilterLine } from "react-icons/ri";
+
 import TablaProductos from "./components/table/TablaProductos";
 import Header from "./components/header/HeaderListaProductos";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
+import SummaryProducts from "./components/summary/SummaryProducts";
+
 import useListProductos from "./hooks/useListProductos";
+import useSearch from "../../../core/hooks/useSearch";
 
 const ListaProductos = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const { 
-    productos, 
-    total, 
+
+  const {
+    productos,
+    total,
     setFilter,
     filter,
-    listarProductosPorFiltro 
+    listarProductosPorFiltro
   } = useListProductos(
     {
       codigo: "",
@@ -31,10 +34,24 @@ const ListaProductos = () => {
       offset: (currentPage - 1) * itemsPerPage,
       orden: "codigo",
       tipOrden: "ASC",
-    }, 
+    },
     { callBack: true }
   );
-  
+
+  const 
+  { 
+    filters: searchFilter,
+    searchTerm,
+    isSearching,
+    handleSearchChange,
+    handleFilterChange,
+    resetSearch 
+  } = useSearch({
+      onSearch: listarProductosPorFiltro,
+      debounceDelay: 300,
+      initialFilter: filter
+    });
+
   const [products, setProducts] = useState(productos);
   const summaryData = [
     {
@@ -67,21 +84,6 @@ const ListaProductos = () => {
     },
   ];
 
-  useEffect(() => {
-    setFilter(prev => ({
-      ...prev,
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage,
-      descripcion: searchQuery || ""
-    }));
-  }, [currentPage, itemsPerPage, searchQuery, setFilter]);
-
-  useEffect(() => {
-    if (searchQuery !== undefined) {
-      setCurrentPage(1);
-    }
-  }, [searchQuery]);
-
   const getStatusColor = (status) => {
     switch (status) {
       case "In Stock":
@@ -102,7 +104,7 @@ const ListaProductos = () => {
       setProducts(productos);
     }
   }, [productos]);
-  
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -118,23 +120,7 @@ const ListaProductos = () => {
         <div className="bg-white rounded-3xl shadow-sm p-6">
           <Header setIsModalOpen={setIsModalOpen} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 rounded-3xl bg-gray-50 border border-gray-100 p-2">
-            {summaryData.map((item, index) => (
-              <div
-                key={index}
-                className="p-5 rounded-2xl border border-gray-100 bg-white shadow-sm"
-              >
-                <div className="flex items-center mb-2">
-                  <span className={`text-${item.color}-600 mr-2 text-lg`}>
-                    {item.icon}
-                  </span>
-                  <span className="text-gray-600">{item.label}</span>
-                </div>
-                <div className="text-3xl font-bold mb-1">{item.value}</div>
-                <div className="text-xs text-gray-500">{item.lastUpdate}</div>
-              </div>
-            ))}
-          </div>
+          <SummaryProducts summaryData={summaryData} />
 
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-100 flex flex-wrap justify-between gap-3">
@@ -142,11 +128,10 @@ const ListaProductos = () => {
                 {filters.map((filter) => (
                   <button
                     key={filter}
-                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedFilter === filter
-                        ? "bg-slate-800 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${selectedFilter === filter
+                      ? "bg-slate-800 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
                     onClick={() => setSelectedFilter(filter)}
                   >
                     {filter}
@@ -158,10 +143,11 @@ const ListaProductos = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search..."
+                    name="descripcion"
+                    placeholder="Buscar por descripción..."
                     className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchTerm}
+                    onChange={handleSearchChange}
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <RiSearchLine className="h-5 w-5 text-gray-400" />
@@ -181,7 +167,7 @@ const ListaProductos = () => {
               />
             </div>
 
-            <Paginacion1 
+            <Paginacion1
               currentPage={currentPage}
               totalItems={total}
               itemsPerPage={itemsPerPage}
