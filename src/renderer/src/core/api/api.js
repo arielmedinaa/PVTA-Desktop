@@ -52,18 +52,21 @@ export const getDataWithFilter = async (url, filter) => {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
             },
             body: JSON.stringify(filter)
-        })
+        });
 
         if (!res.ok) {
-            return null;
-        } else {
-            const data = await res.json();
-            return data;
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Error en la petición');
         }
+        
+        const data = await res.json();
+        return data;
     } catch (error) {
-        return error;
+        console.error('Error en getDataWithFilter:', error);
+        throw error;
     }
 }
 

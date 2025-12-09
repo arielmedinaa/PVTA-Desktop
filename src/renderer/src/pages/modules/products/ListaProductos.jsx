@@ -1,68 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ModalCreateProd from "./components/modals/modalCreateProducts";
 import { RiSearchLine, RiFilterLine } from "react-icons/ri";
 import TablaProductos from "./components/table/TablaProductos";
 import Header from "./components/header/HeaderListaProductos";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
-//import { useListData } from "../../../core/hooks/useListData";
+import useListProductos from "./hooks/useListProductos";
 
 const ListaProductos = () => {
-  //const { fetchListData, listData } = useListData();
-  const [selectedFilter, setSelectedFilter] = useState("All");
-  const [products, setProducts] = useState([
-    {
-      id: "PRD-001",
-      nombre: "Laptop HP EliteBook",
-      categoria: "Tecnología",
-      status: "In Stock",
-      stock: 15,
-      price: 1250.99,
-      image:
-        "https://images.unsplash.com/photo-1496181133205-80b16596d4a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60",
-    },
-    {
-      id: "PRD-002",
-      nombre: "Smartphone Samsung S21",
-      categoria: "Tecnología",
-      status: "Low Stock",
-      stock: 3,
-      price: 899.99,
-      image:
-        "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60",
-    },
-    {
-      id: "PRD-003",
-      nombre: "Audífonos Sony WH-1000XM4",
-      categoria: "Audio",
-      status: "In Stock",
-      stock: 22,
-      price: 349.99,
-      image:
-        "https://images.unsplash.com/photo-1618366712010-f4e9c593b69e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60",
-    },
-    {
-      id: "PRD-004",
-      nombre: "Cámara Canon EOS R5",
-      categoria: "Fotografía",
-      status: "Out of Stock",
-      stock: 0,
-      price: 3899.99,
-      image:
-        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60",
-    },
-    {
-      id: "PRD-005",
-      nombre: 'Tablet iPad Pro 12.9"',
-      categoria: "Tecnología",
-      status: "In Stock",
-      stock: 8,
-      price: 1099.99,
-      image:
-        "https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60",
-    },
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const { 
+    productos, 
+    total, 
+    setFilter,
+    filter,
+    listarProductosPorFiltro 
+  } = useListProductos(
+    {
+      codigo: "",
+      descripcion: "",
+      categoria: "",
+      marca: "",
+      precioini: "",
+      preciofin: "",
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage,
+      orden: "codigo",
+      tipOrden: "ASC",
+    }, 
+    { callBack: true }
+  );
+  
+  const [products, setProducts] = useState(productos);
   const summaryData = [
     {
       label: "En Stock",
@@ -94,6 +67,21 @@ const ListaProductos = () => {
     },
   ];
 
+  useEffect(() => {
+    setFilter(prev => ({
+      ...prev,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage,
+      descripcion: searchQuery || ""
+    }));
+  }, [currentPage, itemsPerPage, searchQuery, setFilter]);
+
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setCurrentPage(1);
+    }
+  }, [searchQuery]);
+
   const getStatusColor = (status) => {
     switch (status) {
       case "In Stock":
@@ -109,12 +97,20 @@ const ListaProductos = () => {
 
   const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
-//   useEffect(() => {
-//     fetchListData("productos");
-//     if (listData) {
-//       setProducts(listData?.dataResponse);
-//     }
-//   }, [fetchListData]);
+  useEffect(() => {
+    if (productos) {
+      setProducts(productos);
+    }
+  }, [productos]);
+  
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize) => {
+    setItemsPerPage(Number(newSize));
+    setCurrentPage(1);
+  };
 
   return (
     <>
@@ -185,7 +181,13 @@ const ListaProductos = () => {
               />
             </div>
 
-            <Paginacion1 data={products} />
+            <Paginacion1 
+              currentPage={currentPage}
+              totalItems={total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
           </div>
         </div>
       </div>

@@ -68,19 +68,5 @@ export const listStock = [
     proveedor: "Proveedor S.A.",
     estado: "En Stock"
   },
-  {
-    productos: {
-      id: 5,
-      nombre: "Producto 5",
-      descripcion: "Descripción del producto 5",
-      codigo: "005",
-      categoria: "Producto 005"
-    },
-    stock: 180,
-    minStock: 60,
-    precio: 1800,
-    proveedor: "Proveedor S.A.",
-    estado: "En Stock"
-  },
 
 ]

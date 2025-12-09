@@ -2,6 +2,7 @@ import { RiFileTextLine, RiMore2Line } from "react-icons/ri";
 import { LuBeef } from "react-icons/lu";
 
 const TablaProductos = ({ products, getStatusColor }) => {
+
   return (
     <>
       <table className="w-full">
@@ -37,7 +38,7 @@ const TablaProductos = ({ products, getStatusColor }) => {
               <td className="px-5 py-4">
                 <div className="flex items-center space-x-2">
                   <RiFileTextLine className="text-gray-400" />
-                  <span>{product.id}</span>
+                  <span>{product.codigo}</span>
                 </div>
               </td>
               <td className="px-5 py-4">
@@ -48,16 +49,16 @@ const TablaProductos = ({ products, getStatusColor }) => {
                   <span className="font-medium">{product.nombre}</span>
                 </div>
               </td>
-              <td className="px-5 py-4 text-gray-600">categoria</td>
+              <td className="px-5 py-4 text-gray-600">{product.familia}</td>
               <td className="px-5 py-4">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.stock)}`}
                 >
-                  {product.status}
+                  {product.familia}
                 </span>
               </td>
               <td className="px-5 py-4 text-gray-600">{product.stock}</td>
-              <td className="px-5 py-4 font-medium">{product.price}</td>
+              <td className="px-5 py-4 font-medium">{product.impuesto}</td>
               <td className="px-5 py-4 text-right">
                 <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full">
                   <RiMore2Line className="w-5 h-5" />
