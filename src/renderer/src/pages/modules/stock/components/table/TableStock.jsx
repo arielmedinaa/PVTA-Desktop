@@ -64,19 +64,19 @@ const TableStock = ({ products = [] }) => {
                       {product.icon || <LuBeef className="h-5 w-5 text-gray-500" />}
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{product.productos?.nombre || 'Sin nombre'}</div>
-                      <div className="text-sm text-gray-500">{product.productos?.codigo || 'Sin código'}</div>
+                      <div className="font-medium text-gray-900">{product.productos?.nombre || 'Sin nombre'}</div>
+                      <div className="text-gray-500">{product.productos?.codigo || 'Sin código'}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                   {product.productos?.categoria || 'Sin categoría'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.stock} unidades</div>
+                  <div className="text-gray-900">{product.stock} unidades</div>
                   <div className="text-xs text-gray-500">Mínimo: {product.minStock || 'No definido'}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                   ${product.precio?.toFixed(2) || '0.00'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

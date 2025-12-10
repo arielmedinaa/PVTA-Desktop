@@ -2,18 +2,25 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RiCloseLine, RiAddLine, RiArrowLeftLine } from 'react-icons/ri';
 import PriceCarousel from '../carrousel/PriceCarrousel';
+import { categories } from '../../../../../core/constants/GlobalUtilsData';
+import { postData } from '../../../../../core/api/api';
+import DropDownError from '../../../../../core/components/dropdown/DropDownError';
 
 const CreateProductModal = ({ isOpen, onClose }) => {
+  const [categoryError, setCategoryError] = useState('');
+
   const [productName, setProductName] = useState('');
   const [productCode, setProductCode] = useState('');
   const [description, setDescription] = useState('');
   const [controlStock, setControlStock] = useState(false);
   const [category, setCategory] = useState('');
-  const [prices, setPrices] = useState([{ name: 'Precio estándar', amount: '', tax: 21 }]);
+  const [prices, setPrices] = useState([{ name: 'Precio estándar', monto: '', impuesto: 10 }]);
 
   const [showCategoryForm, setShowCategoryForm] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [categories, setCategories] = useState(['Electronics', 'Clothing', 'Food', 'Office Supplies']);
+  const [newCategoryName, setNewCategoryName] = useState({
+    nombre: '',
+    subCategoriaId: 0,
+  });
 
   const [isClosing, setIsClosing] = useState(false);
   const [isCategoryClosing, setIsCategoryClosing] = useState(false);
@@ -25,6 +32,30 @@ const CreateProductModal = ({ isOpen, onClose }) => {
       setIsCategoryClosing(false);
     }, 300);
   };
+
+  const handleAddNewCategory = (e) => {
+    const { value, name } = e.target;
+    const prefix = 'CAT-';
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const codigo = `${prefix}${value.substring(0, 3).toUpperCase()}${randomSuffix}`;
+
+    setNewCategoryName({
+      [name]: value.toUpperCase(),
+      codigo: codigo,
+      activo: true,
+      subCategoriaId: 0,
+    });
+  };
+
+  const createCategory = async () => {
+    setCategoryError('');
+    const result = await postData('productos/crearCategoria', newCategoryName, false);
+    if (result === false) {
+      setCategoryError('Error al crear la categoría');
+      return false;
+    }
+    return true;
+  }
 
   const handleCloseModal = () => {
     setIsClosing(true);
@@ -38,12 +69,17 @@ const CreateProductModal = ({ isOpen, onClose }) => {
     }, 300);
   };
 
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      setCategories([...categories, newCategoryName.trim()]);
-      setCategory(newCategoryName.trim());
-      setNewCategoryName('');
-      handleCloseCategory();
+  const handleAddCategory = async () => {
+    if (newCategoryName.nombre.trim()) {
+      const success = await createCategory();
+      if (success) {
+        setCategory(newCategoryName.nombre.trim());
+        setNewCategoryName({
+          nombre: '',
+          subCategoriaId: 0,
+        });
+        handleCloseCategory();
+      }
     }
   };
 
@@ -89,12 +125,12 @@ const CreateProductModal = ({ isOpen, onClose }) => {
                     <h3 className="text-lg font-medium mb-4">Product details</h3>
 
                     <div className="mb-4">
-                      <label htmlFor="productName" className="block mb-1 font-medium">Name</label>
+                      <label htmlFor="nombre" className="block mb-1 font-medium">Nombre</label>
                       <input
                         type="text"
                         id="productName"
                         className="w-full p-3 border border-gray-300 rounded-full"
-                        placeholder="Enter product name"
+                        placeholder="Tipee el nombre del producto..."
                         value={productName}
                         onChange={(e) => setProductName(e.target.value)}
                         required
@@ -207,16 +243,20 @@ const CreateProductModal = ({ isOpen, onClose }) => {
 
             <div className="flex-1 p-6">
               <div className="mb-4">
-                <label htmlFor="categoryName" className="block mb-1 font-medium">Category Name</label>
+                <label htmlFor="nombre" className="block mb-1 font-medium">Category Name</label>
                 <input
                   type="text"
-                  id="categoryName"
-                  className="w-full p-3 border border-gray-300 rounded-full"
+                  id="nombre"
+                  name='nombre'
+                  className={`w-full p-3 border ${categoryError ? 'border-red-500' : 'border-gray-300'} rounded-full focus:outline-none`}
                   placeholder="Enter category name"
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  value={newCategoryName.nombre}
+                  onChange={handleAddNewCategory}
                   autoFocus
                 />
+                {categoryError && (
+                  <DropDownError errorMessage={categoryError} />
+                )}
               </div>
             </div>
 
@@ -230,7 +270,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
               <button
                 onClick={handleAddCategory}
                 className="px-6 py-2 bg-slate-800 text-white rounded-full hover:bg-slate-900"
-                disabled={!newCategoryName.trim()}
+                disabled={!newCategoryName.nombre.trim()}
               >
                 Add
               </button>

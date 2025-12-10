@@ -1,5 +1,6 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 const businessUrl = import.meta.env.VITE_BUSINESS_URL;
+import toast from "react-hot-toast";
 
 export const validateLogin = async (body) => {
     console.log('pasa por el post')
@@ -61,7 +62,7 @@ export const getDataWithFilter = async (url, filter) => {
             const errorData = await res.json().catch(() => ({}));
             throw new Error(errorData.message || 'Error en la petición');
         }
-        
+
         const data = await res.json();
         return data;
     } catch (error) {
@@ -70,23 +71,28 @@ export const getDataWithFilter = async (url, filter) => {
     }
 }
 
-export const postData = async (url, body) => {
+export const postData = async (url, body, showToast = true) => {
     try {
         const res = await fetch(`${businessUrl}${url}`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
             },
             body: JSON.stringify(body)
         })
 
+        const data = await res.json();
         if (!res.ok) {
-            return null;
+            toast.error(data.details.toUpperCase());
+            return false;
         } else {
-            const data = await res.json();
+            showToast ? toast.success(data.messageResponse) : null;
             return data;
         }
     } catch (error) {
+        console.log(error);
+        toast.error(error.details);
         return error;
     }
 }

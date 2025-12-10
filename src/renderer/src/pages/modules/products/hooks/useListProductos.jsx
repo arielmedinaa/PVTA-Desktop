@@ -18,7 +18,6 @@ const useListProductos = (initialFilter = {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    console.log("productos", productos)
 
     const listarProductosPorFiltro = useCallback(async () => {
         setLoading(true);

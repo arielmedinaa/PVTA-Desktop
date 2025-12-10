@@ -101,19 +101,6 @@ const ListaProductos = () => {
     },
   ];
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "In Stock":
-        return "bg-green-100 text-green-800";
-      case "Low Stock":
-        return "bg-amber-100 text-amber-800";
-      case "Out of Stock":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
   useEffect(() => {
@@ -189,7 +176,6 @@ const ListaProductos = () => {
             <div className="overflow-x-auto">
               <TablaProductos
                 products={products}
-                getStatusColor={getStatusColor}
               />
             </div>
 

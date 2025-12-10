@@ -1,8 +1,9 @@
 import { RiFileTextLine, RiMore2Line } from "react-icons/ri";
 import { LuBeef } from "react-icons/lu";
 
-const TablaProductos = ({ products, getStatusColor }) => {
+import { formatNumber } from "../../../../../core/utils/formatNumber"
 
+const TablaProductos = ({ products }) => {
   return (
     <>
       <table className="w-full">
@@ -17,7 +18,6 @@ const TablaProductos = ({ products, getStatusColor }) => {
             <th className="px-5 py-4 text-gray-600 font-medium">Product ID</th>
             <th className="px-5 py-4 text-gray-600 font-medium">Product</th>
             <th className="px-5 py-4 text-gray-600 font-medium">Category</th>
-            <th className="px-5 py-4 text-gray-600 font-medium">Status</th>
             <th className="px-5 py-4 text-gray-600 font-medium">Stock</th>
             <th className="px-5 py-4 text-gray-600 font-medium">Price</th>
             <th className="px-5 py-4 text-gray-600 font-medium"></th>
@@ -50,15 +50,10 @@ const TablaProductos = ({ products, getStatusColor }) => {
                 </div>
               </td>
               <td className="px-5 py-4 text-gray-600">{product.familia}</td>
-              <td className="px-5 py-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.stock)}`}
-                >
-                  {product.familia}
-                </span>
-              </td>
               <td className="px-5 py-4 text-gray-600">{product.stock}</td>
-              <td className="px-5 py-4 font-medium">{product.impuesto}</td>
+              <td className="px-5 py-4 font-medium text-emerald-600">
+                {formatNumber(product?.precio?.find((p) => p.activo === true)?.precio || 0)}
+              </td>
               <td className="px-5 py-4 text-right">
                 <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full">
                   <RiMore2Line className="w-5 h-5" />
