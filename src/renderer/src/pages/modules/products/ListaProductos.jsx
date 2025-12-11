@@ -6,6 +6,7 @@ import TablaProductos from "./components/table/TablaProductos";
 import Header from "./components/header/HeaderListaProductos";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
 import SummaryProducts from "./components/summary/SummaryProducts";
+import { modes } from "../../../core/constants/GlobalUtilsData";
 
 import useListProductos from "./hooks/useListProductos";
 import useSearch from "../../../core/hooks/useSearch";
@@ -33,6 +34,7 @@ const ListaProductos = () => {
     productos,
     total,
     setFilter,
+    setTotal, // Asegúrate de que tu hook exponga esta función
   } = useListProductos(initialFilter, { callBack: true });
 
   const {
@@ -70,6 +72,7 @@ const ListaProductos = () => {
   }, [currentPage, itemsPerPage, setFilter]);
 
   const [products, setProducts] = useState(productos);
+  
   const summaryData = [
     {
       label: "En Stock",
@@ -104,18 +107,28 @@ const ListaProductos = () => {
   const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
   useEffect(() => {
-    setFilter(prev => ({
-      ...prev,
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage
-    }));
-  }, [currentPage, itemsPerPage, setFilter]);
-
-  useEffect(() => {
     if (productos) {
       setProducts(productos);
     }
   }, [productos]);
+
+  // Función para manejar la adición optimista de productos
+  const handleAddProduct = useCallback((newProduct) => {
+    const currentOffset = (currentPage - 1) * itemsPerPage;
+    const currentPageProducts = products.length;
+    if (currentPageProducts < itemsPerPage) {
+      setProducts(prev => [...prev, newProduct]);
+    }
+    
+    setTotal(prevTotal => prevTotal + 1);
+    
+    const newTotal = total + 1;
+    const newTotalPages = Math.ceil(newTotal / itemsPerPage);
+    
+    if (currentPageProducts >= itemsPerPage && currentPage === Math.ceil(total / itemsPerPage)) {
+      setCurrentPage(newTotalPages);
+    }
+  }, [currentPage, itemsPerPage, products.length, total, setTotal]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -192,6 +205,8 @@ const ListaProductos = () => {
       <ModalCreateProd
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onAddProduct={handleAddProduct}
+        mode={modes.INS}
       />
     </>
   );

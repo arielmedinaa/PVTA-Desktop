@@ -1,61 +1,211 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { RiCloseLine, RiAddLine, RiArrowLeftLine } from 'react-icons/ri';
+import { RiCloseLine, RiAddLine } from 'react-icons/ri';
+
 import PriceCarousel from '../carrousel/PriceCarrousel';
+import ModalAddCategory from './ModalAddCategory';
+
 import { categories } from '../../../../../core/constants/GlobalUtilsData';
 import { postData } from '../../../../../core/api/api';
+import { validarExistenciaPorCodigo } from '../../api/api.productos';
 import DropDownError from '../../../../../core/components/dropdown/DropDownError';
 
-const CreateProductModal = ({ isOpen, onClose }) => {
-  const [categoryError, setCategoryError] = useState('');
+const CreateProductModal = ({ isOpen, onClose, onAddProduct, mode }) => {
+  const [formData, setFormData] = useState({
+    codigo: '',
+    nombre: '',
+    stock: false,
+    descripcion: '',
+    unidadMedida: 'UND',
+    categoriaId: 0,
+    proveedor: '',
+    nomenclatura: ''
+  });
 
-  const [productName, setProductName] = useState('');
-  const [productCode, setProductCode] = useState('');
-  const [description, setDescription] = useState('');
-  const [controlStock, setControlStock] = useState(false);
-  const [category, setCategory] = useState('');
-  const [prices, setPrices] = useState([{ name: 'Precio estándar', monto: '', impuesto: 10 }]);
+  const [prices, setPrices] = useState([
+    {
+      tipoPrecio: 'Precio estándar',
+      precio: '',
+      iva: 10,
+      moneda: 'PYG',
+      linea: 1,
+      activo: true
+    }
+  ]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isCategoryClosing, setIsCategoryClosing] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
+
+  // Estados para errores y carga
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categoryError, setCategoryError] = useState('')
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
+
   const [newCategoryName, setNewCategoryName] = useState({
     nombre: '',
     subCategoriaId: 0,
   });
 
-  const [isClosing, setIsClosing] = useState(false);
-  const [isCategoryClosing, setIsCategoryClosing] = useState(false);
+  const debounceTimeoutRef = useRef(null);
 
-  const handleCloseCategory = () => {
-    setIsCategoryClosing(true);
-    setTimeout(() => {
-      setShowCategoryForm(false);
-      setIsCategoryClosing(false);
-    }, 300);
-  };
+  const filteredCategories = categories.filter(cat =>
+    cat.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const handleAddNewCategory = (e) => {
-    const { value, name } = e.target;
-    const prefix = 'CAT-';
-    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const codigo = `${prefix}${value.substring(0, 3).toUpperCase()}${randomSuffix}`;
+  const validarExistencia = async (codigo) => {
+    if (!codigo.trim()) return;
 
-    setNewCategoryName({
-      [name]: value.toUpperCase(),
-      codigo: codigo,
-      activo: true,
-      subCategoriaId: 0,
-    });
-  };
+    setIsValidatingCode(true);
+    try {
+      const response = await validarExistenciaPorCodigo(codigo);
 
-  const createCategory = async () => {
-    setCategoryError('');
-    const result = await postData('productos/crearCategoria', newCategoryName, false);
-    if (result === false) {
-      setCategoryError('Error al crear la categoría');
-      return false;
+      if (response && response.existe) {
+        setErrors(prev => ({
+          ...prev,
+          codigo: response.mensaje
+        }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.codigo;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error('Error validating code:', error);
+    } finally {
+      setIsValidatingCode(false);
     }
-    return true;
-  }
+  };
+
+  const displayedCategories = showAllCategories
+    ? filteredCategories
+    : filteredCategories.slice(0, 3);
+
+  const handleInputChange = async (e) => {
+    const { name, value, type, checked } = e.target;
+
+    if (name === 'codigo') {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      if (value.trim() !== '') {
+        debounceTimeoutRef.current = setTimeout(() => {
+          validarExistencia(value);
+        }, 800);
+      }
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value.toUpperCase()
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = 'El nombre es requerido';
+    }
+
+    if (!formData.codigo.trim()) {
+      newErrors.codigo = 'El código es requerido';
+    }
+
+    if (!formData.categoriaId || formData.categoriaId === 0) {
+      newErrors.categoria = 'Debe seleccionar una categoría';
+    }
+
+    const invalidPrices = prices.some(price =>
+      !price.tipoPrecio.trim() || !price.precio || parseFloat(price.precio) <= 0
+    );
+
+    if (invalidPrices) {
+      newErrors.precios = 'Todos los precios deben tener nombre y monto válido';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const transformPricesToBackend = () => {
+    return prices.map((price, index) => ({
+      tipoPrecio: price.tipoPrecio,
+      precio: Math.round(parseFloat(price.precio) * 100),
+      iva: parseInt(price.iva),
+      moneda: price.moneda,
+      linea: index + 1,
+      activo: price.activo ?? false
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const productData = {
+        ...formData,
+        categoriaId: parseInt(formData.categoriaId),
+        precios: transformPricesToBackend()
+      };
+
+      const response = await postData('productos/grabar', productData, true);
+      if (response && response.dataResponse) {
+        resetForm();
+        handleCloseModal();
+        onAddProduct(response.dataResponse);
+      } else {
+        setErrors({ submit: 'Error al crear el producto. Intente nuevamente.' });
+      }
+    } catch (error) {
+      console.error('Error al guardar producto:', error);
+      setErrors({
+        submit: error.message || 'Error al crear el producto. Intente nuevamente.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      codigo: '',
+      nombre: '',
+      stock: false,
+      descripcion: '',
+      unidadMedida: 'UND',
+      categoriaId: 0,
+      proveedor: '',
+      nomenclatura: ''
+    });
+    setPrices([
+      {
+        tipoPrecio: 'Precio estándar',
+        precio: '',
+        iva: 10,
+        moneda: 'PYG',
+        linea: 1,
+        activo: true
+      }
+    ]);
+    setSelectedCategory('');
+    setSearchTerm('');
+    setErrors({});
+  };
 
   const handleCloseModal = () => {
     setIsClosing(true);
@@ -66,14 +216,59 @@ const CreateProductModal = ({ isOpen, onClose }) => {
     setTimeout(() => {
       onClose();
       setIsClosing(false);
+      resetForm();
     }, 300);
+  };
+
+  const handleCloseCategory = () => {
+    setIsCategoryClosing(true);
+    setTimeout(() => {
+      setShowCategoryForm(false);
+      setIsCategoryClosing(false);
+    }, 300);
+  };
+
+  const handleAddNewCategory = (e) => {
+    const { value } = e.target;
+    const prefix = 'CAT-';
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const codigo = `${prefix}${value.substring(0, 3).toUpperCase()}${randomSuffix}`;
+
+    setNewCategoryName({
+      nombre: value.toUpperCase(),
+      codigo: codigo,
+      activo: true,
+      subCategoriaId: 0,
+    });
+  };
+
+  const createCategory = async () => {
+    setCategoryError('');
+    try {
+      const result = await postData('productos/crearCategoria', newCategoryName, false);
+      if (!result || result === false) {
+        setCategoryError('Error al crear la categoría');
+        return null;
+      }
+      return result;
+    } catch (error) {
+      setCategoryError('Error al crear la categoría: ' + error.message);
+      return null;
+    }
   };
 
   const handleAddCategory = async () => {
     if (newCategoryName.nombre.trim()) {
-      const success = await createCategory();
-      if (success) {
-        setCategory(newCategoryName.nombre.trim());
+      const newCategory = await createCategory();
+      if (newCategory) {
+        const categoryId = newCategory.id || newCategory.dataResponse?.id;
+
+        setFormData(prev => ({
+          ...prev,
+          categoriaId: categoryId
+        }));
+        setSelectedCategory(newCategoryName.nombre.trim());
+        setSearchTerm(newCategoryName.nombre.trim());
         setNewCategoryName({
           nombre: '',
           subCategoriaId: 0,
@@ -83,18 +278,26 @@ const CreateProductModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log({
-      name: productName,
-      code: productCode,
-      description,
-      controlStock,
-      category,
-      prices
-    });
-    handleCloseModal();
+  const handleCategorySelect = (cat, categoryId) => {
+    setSelectedCategory(cat);
+    setSearchTerm(cat);
+    setFormData(prev => ({
+      ...prev,
+      categoriaId: categoryId
+    }));
+    setShowDropdown(false);
+    if (errors.categoria) {
+      setErrors(prev => ({ ...prev, categoria: '' }));
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -102,7 +305,7 @@ const CreateProductModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="flex items-start space-x-4">
         <motion.div
-          className="bg-white rounded-2xl shadow-lg w-[700px] max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-white rounded-2xl shadow-lg w-[900px] max-h-[90vh] overflow-hidden flex flex-col p-3"
           initial={{ y: -50, opacity: 0 }}
           animate={{
             y: isClosing ? -50 : 0,
@@ -111,171 +314,264 @@ const CreateProductModal = ({ isOpen, onClose }) => {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           <div className="flex justify-between items-center p-6 border-gray-200">
-            <h2 className="text-xl font-bold">Create New Product</h2>
-            <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">
+            <h2 className="text-xl font-bold">Nuevo Producto</h2>
+            <button
+              onClick={handleCloseModal}
+              className="text-gray-500 hover:text-gray-700"
+              disabled={isSubmitting}
+            >
               <RiCloseLine className="w-6 h-6" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
-            <form onSubmit={handleSubmit}>
+            <div>
+              <DropDownError message={errors.submit} />
+
               <div className="space-y-6">
                 <div className='flex-1 bg-gray-50 rounded-3xl p-3'>
                   <div className='bg-white rounded-xl shadow-md p-4'>
-                    <h3 className="text-lg font-medium mb-4">Product details</h3>
+                    <h3 className="text-lg font-medium mb-4">Detalles del Producto</h3>
 
                     <div className="mb-4">
-                      <label htmlFor="nombre" className="block mb-1 font-medium">Nombre</label>
+                      <label htmlFor="nombre" className="block mb-1 font-medium">
+                        Nombre <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
-                        id="productName"
-                        className="w-full p-3 border border-gray-300 rounded-full"
-                        placeholder="Tipee el nombre del producto..."
-                        value={productName}
-                        onChange={(e) => setProductName(e.target.value)}
-                        required
+                        id="nombre"
+                        name="nombre"
+                        className={`w-full p-3 border rounded-full ${errors.nombre ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        placeholder="Ingrese el nombre del producto..."
+                        value={formData.nombre}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
                       />
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="productCode" className="block mb-1 font-medium">Product Code</label>
-                      <input
-                        type="text"
-                        id="productCode"
-                        className="w-full p-3 border border-gray-300 rounded-full"
-                        placeholder="Enter product code"
-                        value={productCode}
-                        onChange={(e) => setProductCode(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="category" className="block mb-1 font-medium">Category</label>
-                      <div className="flex space-x-2">
-                        <select
-                          id="category"
-                          className="flex-1 p-3 border border-gray-300 rounded-full"
-                          value={category}
-                          onChange={(e) => setCategory(e.target.value)}
-                        >
-                          <option value="">Select a category</option>
-                          {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => setShowCategoryForm(true)}
-                          className="p-3 bg-slate-800 rounded-full hover:bg-slate-900 text-white"
-                        >
-                          <RiAddLine className="w-5 h-5" />
-                        </button>
+                      <div className="mt-1">
+                        {errors.nombre && <DropDownError errorMessage={errors.nombre} />}
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="description" className="block mb-1 font-medium">Description</label>
+                      <label htmlFor="codigo" className="block mb-1 font-medium">
+                        Código de Producto <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="codigo"
+                        name="codigo"
+                        className={`w-full p-3 border rounded-full ${errors.codigo ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        placeholder="Ingrese el código del producto"
+                        value={formData.codigo}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
+                      />
+                      <div className="mt-1">
+                        {errors.codigo && <DropDownError errorMessage={errors.codigo} />}
+                      </div>
+                    </div>
+
+                    <div className="mb-4 relative">
+                      <label htmlFor="category" className="block mb-1 font-medium">
+                        Categoría <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          id="category"
+                          className={`w-full p-3 border rounded-full pr-12 ${errors.categoria ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          placeholder="Buscar categoría..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onFocus={() => setShowDropdown(true)}
+                          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                          disabled={isSubmitting}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCategoryForm(true)}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700"
+                          title="Agregar nueva categoría"
+                          disabled={isSubmitting}
+                        >
+                          <RiAddLine className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {showDropdown && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-2xl shadow-lg max-h-60 overflow-auto">
+                          {displayedCategories.length > 0 ? (
+                            <>
+                              <ul className="py-1">
+                                {displayedCategories.map((cat, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleCategorySelect(cat, idx + 1)}
+                                    title={cat}
+                                  >
+                                    <div className="truncate">{cat}</div>
+                                  </li>
+                                ))}
+                              </ul>
+                              {!showAllCategories && filteredCategories.length > 3 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowAllCategories(true);
+                                  }}
+                                  className="w-full text-center py-2 text-sm text-blue-600 hover:bg-gray-50"
+                                >
+                                  Mostrar más categorías
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <div className="px-4 py-2 text-sm text-gray-500">
+                              No se encontraron categorías
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <div className='mt-1'>
+                        {errors.categoria && (
+                          <DropDownError errorMessage={errors.categoria} />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label htmlFor="unidadMedida" className="block mb-1 font-medium">
+                          Unidad de Medida
+                        </label>
+                        <select
+                          id="unidadMedida"
+                          name="unidadMedida"
+                          className="w-full p-3 border border-gray-300 rounded-full"
+                          value={formData.unidadMedida}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                        >
+                          <option value="UND">Unidad</option>
+                          <option value="KG">Kilogramo</option>
+                          <option value="LT">Litro</option>
+                          <option value="MT">Metro</option>
+                          <option value="CJ">Caja</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label htmlFor="proveedor" className="block mb-1 font-medium">
+                          Proveedor
+                        </label>
+                        <input
+                          type="text"
+                          id="proveedor"
+                          name="proveedor"
+                          className="w-full p-3 border border-gray-300 rounded-full"
+                          placeholder="Nombre del proveedor"
+                          value={formData.proveedor}
+                          onChange={handleInputChange}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="nomenclatura" className="block mb-1 font-medium">
+                        Nomenclatura
+                      </label>
+                      <input
+                        type="text"
+                        id="nomenclatura"
+                        name="nomenclatura"
+                        className="w-full p-3 border border-gray-300 rounded-full"
+                        placeholder="Nomenclatura del producto"
+                        value={formData.nomenclatura}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="descripcion" className="block mb-1 font-medium">
+                        Descripción
+                      </label>
                       <textarea
-                        id="description"
+                        id="descripcion"
+                        name="descripcion"
                         rows={3}
                         className="w-full p-3 border border-gray-300 rounded-2xl resize-none"
-                        placeholder="Enter product description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Ingrese la descripción del producto"
+                        value={formData.descripcion}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div className="flex items-center mb-4">
                       <input
                         type="checkbox"
-                        id="controlStock"
-                        className="h-4 w-4 text-blue-600 rounded-2xl border-gray-300 mr-2"
-                        checked={controlStock}
-                        onChange={(e) => setControlStock(e.target.checked)}
+                        id="stock"
+                        name="stock"
+                        className="h-4 w-4 text-blue-600 rounded border-gray-300 mr-2"
+                        checked={formData.stock}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
                       />
-                      <label htmlFor="controlStock" className="font-medium">
-                        Control stock for this product
+                      <label htmlFor="stock" className="font-medium">
+                        Controlar stock para este producto
                       </label>
                     </div>
                   </div>
                 </div>
-                <PriceCarousel prices={prices} setPrices={setPrices} maxPrices={5} />
+
+                {mode === "INS" ?
+                  <div className='flex-1 bg-gray-50 rounded-3xl p-3 items-center'>
+                    <PriceCarousel
+                      prices={prices}
+                      setPrices={setPrices}
+                      maxPrices={5}
+                      disabled={isSubmitting}
+                    />
+                    {errors.precios && (
+                      <p className="mt-2 text-sm text-red-500 text-center">{errors.precios}</p>
+                    )}
+                  </div>
+                  :
+                  <></>
+                }
               </div>
-            </form>
+            </div>
           </div>
 
-          <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+          <div className="flex justify-end space-x-4 pt-4 px-6 pb-6 border-t border-gray-200">
             <button
+              type="button"
               onClick={handleCloseModal}
-              className="px-6 py-2 text-slate-700 rounded-full border hover:bg-slate-50 duration-300"
+              className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50"
+              disabled={isSubmitting}
             >
-              Cancel
+              Cancelar
             </button>
             <button
+              type="button"
               onClick={handleSubmit}
-              className="px-6 py-2 bg-slate-800 text-white rounded-full hover:bg-slate-900"
+              className="px-6 py-2 text-white bg-slate-800 rounded-full hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Create new product
+              {isSubmitting ? 'Guardando...' : 'Guardar Producto'}
             </button>
           </div>
         </motion.div>
 
         {(showCategoryForm || isCategoryClosing) && (
-          <motion.div
-            className="bg-white rounded-2xl shadow-lg w-80 max-h-[90vh] overflow-hidden flex flex-col"
-            initial={{ x: 100, opacity: 0 }}
-            animate={{
-              x: isCategoryClosing ? 100 : 0,
-              opacity: isCategoryClosing ? 0 : 1
-            }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <div className="flex items-center p-6 border-b border-gray-200">
-              <button
-                className="mr-4 text-gray-500 hover:text-gray-700"
-                onClick={handleCloseCategory}
-              >
-                <RiArrowLeftLine className="w-5 h-5" />
-              </button>
-              <h2 className="text-xl font-bold">Add Category</h2>
-            </div>
-
-            <div className="flex-1 p-6">
-              <div className="mb-4">
-                <label htmlFor="nombre" className="block mb-1 font-medium">Category Name</label>
-                <input
-                  type="text"
-                  id="nombre"
-                  name='nombre'
-                  className={`w-full p-3 border ${categoryError ? 'border-red-500' : 'border-gray-300'} rounded-full focus:outline-none`}
-                  placeholder="Enter category name"
-                  value={newCategoryName.nombre}
-                  onChange={handleAddNewCategory}
-                  autoFocus
-                />
-                {categoryError && (
-                  <DropDownError errorMessage={categoryError} />
-                )}
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
-              <button
-                onClick={handleCloseCategory}
-                className="px-6 py-2 text-slate-700 rounded-full border hover:bg-slate-50 duration-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddCategory}
-                className="px-6 py-2 bg-slate-800 text-white rounded-full hover:bg-slate-900"
-                disabled={!newCategoryName.nombre.trim()}
-              >
-                Add
-              </button>
-            </div>
-          </motion.div>
+          <ModalAddCategory categoryError={categoryError} handleAddCategory={handleAddCategory} handleCloseCategory={handleCloseCategory} newCategoryName={newCategoryName} isCategoryClosing={isCategoryClosing} handleAddNewCategory={handleAddNewCategory} />
         )}
       </div>
     </div>

@@ -540,3 +540,10 @@ export const categories = [
   "Gestión de redes sociales",
   "Diseño de campañas publicitarias"
 ];
+
+export const modes = {
+  INS: "INS" /* Inserción */,
+  UPD: "UPD" /* Actualización */,
+  DLT: "DLT" /* Eliminación */,
+  SUBSTR: "SUBSTR" /* Sustracción */
+};

@@ -1,7 +1,8 @@
-import { RiFileTextLine, RiMore2Line } from "react-icons/ri";
+import { RiEyeLine, RiFileTextLine, RiMoneyDollarCircleFill, RiMore2Line } from "react-icons/ri";
 import { LuBeef } from "react-icons/lu";
 
 import { formatNumber } from "../../../../../core/utils/formatNumber"
+import DropdownMenu from "../../../../../core/components/dropdown/DropDown";
 
 const TablaProductos = ({ products }) => {
   return (
@@ -55,9 +56,21 @@ const TablaProductos = ({ products }) => {
                 {formatNumber(product?.precio?.find((p) => p.activo === true)?.precio || 0)}
               </td>
               <td className="px-5 py-4 text-right">
-                <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full">
-                  <RiMore2Line className="w-5 h-5" />
-                </button>
+                <DropdownMenu
+                  options={[
+                    {
+                      label: "Modificar",
+                      //onClick: () => handleViewPayment(payment),
+                      icon: RiEyeLine,
+                    },
+                    {
+                      label: "Eliminar",
+                      //onClick: () => handleOpenPaymentModal(payment),
+                      icon: RiMoneyDollarCircleFill,
+                      //visible: payment.estado === "Pendiente" || payment.estado === "Parcial" || payment.estado === "Vencido",
+                    },
+                  ]}
+                />
               </td>
             </tr>
           ))}
