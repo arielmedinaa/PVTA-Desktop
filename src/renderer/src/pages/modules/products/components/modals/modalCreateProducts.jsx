@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RiCloseLine, RiAddLine } from 'react-icons/ri';
+import { Minus, Plus } from 'lucide-react';
 
 import PriceCarousel from '../carrousel/PriceCarrousel';
 import ModalAddCategory from './ModalAddCategory';
@@ -19,7 +20,9 @@ const CreateProductModal = ({ isOpen, onClose, onAddProduct, mode }) => {
     unidadMedida: 'UND',
     categoriaId: 0,
     proveedor: '',
-    nomenclatura: ''
+    nomenclatura: '',
+    costoInicial: 0,
+    cantidadInicial: 0
   });
 
   const [prices, setPrices] = useState([
@@ -514,19 +517,110 @@ const CreateProductModal = ({ isOpen, onClose, onAddProduct, mode }) => {
                       />
                     </div>
 
-                    <div className="flex items-center mb-4">
-                      <input
-                        type="checkbox"
-                        id="stock"
-                        name="stock"
-                        className="h-4 w-4 text-blue-600 rounded border-gray-300 mr-2"
-                        checked={formData.stock}
-                        onChange={handleInputChange}
-                        disabled={isSubmitting}
-                      />
-                      <label htmlFor="stock" className="font-medium">
-                        Controlar stock para este producto
-                      </label>
+                    <div className="mb-4">
+                      <div className="flex items-start">
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, stock: !formData.stock })}
+                          className="flex items-center text-left w-full group"
+                          disabled={isSubmitting}
+                        >
+                          <div className={`flex-shrink-0 h-5 w-5 flex items-center justify-center border rounded-md mr-3 transition-colors ${
+                            formData.stock 
+                              ? 'bg-blue-100 border-blue-500' 
+                              : 'bg-white border-gray-300 group-hover:border-gray-400' 
+                          }`}>
+                            {formData.stock ? (
+                              <svg className="h-3.5 w-3.5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            ) : (
+                              <div className="h-2 w-2 rounded-sm bg-transparent" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Controlar stock para este producto</div>
+                            <p className="text-sm text-gray-500">
+                              {formData.stock 
+                                ? 'Opcional: Agrega un stock inicial y su costo' 
+                                : 'Haz clic para configurar el control de stock y agregar existencias iniciales'}
+                            </p>
+                          </div>
+                          <div className="ml-auto">
+                            <svg 
+                              className={`h-5 w-5 text-gray-400 transform transition-transform ${formData.stock ? 'rotate-180' : ''}`} 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              viewBox="0 0 20 20" 
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </button>
+                      </div>
+                      {formData.stock && (
+                        <div className="mt-3 ml-8 p-4 bg-gray-50 rounded-xl border border-gray-200 relative z-10 transition-all duration-200 ease-in-out">
+                          <div className="mb-3">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Costo inicial
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              className="w-full p-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="0.00"
+                              value={formData.costoInicial || ''}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                costoInicial: parseFloat(e.target.value) || 0
+                              })}
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Cantidad inicial
+                            </label>
+                            <div className="flex items-center">
+                              <button
+                                type="button"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  cantidadInicial: Math.max(0, (formData.cantidadInicial || 0) - 1)
+                                })}
+                                className="p-2 border border-r-0 border-gray-300 rounded-l-2xl bg-gray-50 hover:bg-gray-100 focus:outline-none shadow-sm"
+                                disabled={isSubmitting}
+                              >
+                                <Minus className="h-3 w-3 text-gray-600" />
+                              </button>
+                              <input
+                                type="number"
+                                min="0"
+                                value={formData.cantidadInicial || 0}
+                                onChange={(e) => setFormData({
+                                  ...formData,
+                                  cantidadInicial: Math.max(0, parseInt(e.target.value) || 0)
+                                })}
+                                className="w-16 h-7 text-center border-t border-b border-gray-300 py-2 text-sm focus:outline-none shadow-sm"
+                                disabled={isSubmitting}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setFormData({
+                                  ...formData,
+                                  cantidadInicial: (formData.cantidadInicial || 0) + 1
+                                })}
+                                className="p-2 border border-l-0 border-gray-300 rounded-r-2xl bg-gray-50 hover:bg-gray-100 focus:outline-none shadow-sm"
+                                disabled={isSubmitting}
+                              >
+                                <Plus className="h-3 w-3 text-gray-600" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

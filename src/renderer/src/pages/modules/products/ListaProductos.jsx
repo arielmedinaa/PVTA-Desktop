@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback } from "react";
 import ModalCreateProd from "./components/modals/modalCreateProducts";
 import { RiSearchLine, RiFilterLine } from "react-icons/ri";
 
@@ -6,72 +6,29 @@ import TablaProductos from "./components/table/TablaProductos";
 import Header from "./components/header/HeaderListaProductos";
 import Paginacion1 from "../../../core/components/pagination/Paginacion1";
 import SummaryProducts from "./components/summary/SummaryProducts";
+import useProducts from "./hooks/useProducts";
+import useSearch from "../../../core/hooks/useSearch";
 import { modes } from "../../../core/constants/GlobalUtilsData";
 
-import useListProductos from "./hooks/useListProductos";
-import useSearch from "../../../core/hooks/useSearch";
-
 const ListaProductos = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
-  const [selectedFilter, setSelectedFilter] = useState("All");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const initialFilter = useMemo(() => ({
-    codigo: "",
-    descripcion: "",
-    categoria: "",
-    marca: "",
-    precioini: "",
-    preciofin: "",
-    limit: itemsPerPage,
-    offset: 0,
-    orden: "codigo",
-    tipOrden: "ASC",
-  }), [itemsPerPage]);
-
   const {
-    productos,
+    currentPage,
+    itemsPerPage,
     total,
-    setFilter,
-    setTotal, // Asegúrate de que tu hook exponga esta función
-  } = useListProductos(initialFilter, { callBack: true });
-
-  const {
-    searchTerm,
-    handleSearchChange,
-    isSearching
-  } = useSearch({
-    onSearch: useCallback((searchParams) => {
-      setFilter(prev => {
-        const newFilter = {
-          ...prev,
-          ...searchParams,
-          offset: 0,
-          limit: itemsPerPage
-        };
-        if (searchParams.codigo === undefined) {
-          newFilter.codigo = "";
-        } else if (searchParams.codigo === "") {
-          newFilter.codigo = "";
-        }
-        return newFilter;
-      });
-      setCurrentPage(1);
-    }, [setFilter, itemsPerPage]),
-    debounceDelay: 500,
-    searchField: 'codigo'
-  });
-
-  useEffect(() => {
-    setFilter(prev => ({
-      ...prev,
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage
-    }));
-  }, [currentPage, itemsPerPage, setFilter]);
-
-  const [products, setProducts] = useState(productos);
+    selectedFilter,
+    isModalOpen,
+    loading,
+    products,
+    
+    // Handlers
+    setIsModalOpen,
+    setSelectedFilter,
+    handlePageChange,
+    handlePageSizeChange,
+    addProduct,
+    refreshProducts,
+    handleSearch
+  } = useProducts(4);
   
   const summaryData = [
     {
@@ -106,39 +63,17 @@ const ListaProductos = () => {
 
   const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
-  useEffect(() => {
-    if (productos) {
-      setProducts(productos);
-    }
-  }, [productos]);
-
-  // Función para manejar la adición optimista de productos
-  const handleAddProduct = useCallback((newProduct) => {
-    const currentOffset = (currentPage - 1) * itemsPerPage;
-    const currentPageProducts = products.length;
-    if (currentPageProducts < itemsPerPage) {
-      setProducts(prev => [...prev, newProduct]);
-    }
-    
-    setTotal(prevTotal => prevTotal + 1);
-    
-    const newTotal = total + 1;
-    const newTotalPages = Math.ceil(newTotal / itemsPerPage);
-    
-    if (currentPageProducts >= itemsPerPage && currentPage === Math.ceil(total / itemsPerPage)) {
-      setCurrentPage(newTotalPages);
-    }
-  }, [currentPage, itemsPerPage, products.length, total, setTotal]);
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handlePageSizeChange = (newSize) => {
-    const newPageSize = Number(newSize);
-    setItemsPerPage(newPageSize);
-    setCurrentPage(1);
-  };
+  const {
+    searchTerm,
+    handleSearchChange,
+    isSearching
+  } = useSearch({
+    onSearch: useCallback((searchParams) => {
+      handleSearch(searchParams.codigo || '');
+    }, [handleSearch]),
+    debounceDelay: 500,
+    searchField: 'codigo'
+  });
 
   return (
     <>
@@ -205,7 +140,7 @@ const ListaProductos = () => {
       <ModalCreateProd
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddProduct={handleAddProduct}
+        onAddProduct={addProduct}
         mode={modes.INS}
       />
     </>
